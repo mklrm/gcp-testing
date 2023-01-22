@@ -14,7 +14,6 @@ locals {
   ])
   compute_networks = flatten([
     for network in local.compute_networks_initial : {
-      # TODO This doesn't work right yet, postfix will be added even if name_postfix_disable is set to true
       name                     = network.name_explicitly_set == true ? network.name : network.name_postfix_disable == true ? network.name_prefix : "${network.name_prefix}-${network.name_postfix}"
       name_prefix              = network.name_prefix
       name_postfix             = network.name_postfix

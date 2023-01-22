@@ -12,7 +12,7 @@ variable "compute_networks" {
     name                    = optional(string)
     name_prefix             = optional(string)
     name_postfix            = optional(string)
-    name_postfix_disable    = optional(string)
+    name_postfix_disable    = optional(bool)
     project                 = optional(string)
     auto_create_subnetworks = optional(bool)
     compute_network_peerings = optional(list(object({

@@ -18,9 +18,9 @@ module "compute_networks" {
   source = "./module-0"
   compute_networks = [
     {
-      #name = "booyah"
-      name_prefix             = "amazing-app-spoke"
-      name_postfix_disable    = true
+      #name                    = "booyah"
+      name_prefix = "amazing-app-spoke"
+      #name_postfix_disable    = true
       project                 = var.project
       auto_create_subnetworks = false
       #compute_network_peerings = [
