@@ -25,12 +25,27 @@ resource "google_compute_subnetwork" "compute_subnetworks" {
 }
 
 resource "google_compute_network_peering" "compute_network_peerings" {
-  for_each                            = { for peering in local.compute_network_peerings : (peering.name_explicitly_defined == true ? peering.name : "${peering.name}-peering-to-${peering.peer_network_name}") => peering }
-  name                                = each.value.name_explicitly_defined == true ? each.value.name : "${each.value.name}-peering-to-${each.value.peer_network_name}"
-  network                             = google_compute_network.compute_networks[each.value.name].self_link
+  for_each                            = { for peering in local.compute_network_peerings : peering.name => peering }
+  name                                = each.value.name
+  network                             = google_compute_network.compute_networks[each.value.network_name].self_link
   peer_network                        = google_compute_network.compute_networks[each.value.peer_network_name].self_link
   export_custom_routes                = each.value.export_custom_routes
   import_custom_routes                = each.value.import_custom_routes
   export_subnet_routes_with_public_ip = each.value.export_subnet_routes_with_public_ip
   import_subnet_routes_with_public_ip = each.value.import_subnet_routes_with_public_ip
+  # Debugging:
+  #lifecycle {
+  #  precondition {
+  #    condition     = each.value.peer_network_name == "somethingelsethanthis"
+  #    error_message = "each.value.peer_network_name is ${each.value.peer_network_name}"
+  #  }
+  #  #precondition {
+  #  #  condition     = each.value.peer_network_name_postfix_disable == true
+  #  #  error_message = "each.value.peer_network_name_postfix_disable == false"
+  #  #}
+  #  #precondition {
+  #  #  condition     = each.value.peer_network_name_postfix_disable == false
+  #  #  error_message = "each.value.peer_network_name_postfix_disable == true"
+  #  #}
+  #}
 }

@@ -1,5 +1,5 @@
 locals {
-  compute_networks_initial = flatten([
+  compute_networks_0 = flatten([
     for network in var.compute_networks : {
       name                     = network.name
       name_explicitly_set      = network.name != null ? true : false
@@ -13,7 +13,7 @@ locals {
     }
   ])
   compute_networks = flatten([
-    for network in local.compute_networks_initial : {
+    for network in local.compute_networks_0 : {
       name                     = network.name_explicitly_set == true ? network.name : network.name_postfix_disable == true ? network.name_prefix : "${network.name_prefix}-${network.name_postfix}"
       name_prefix              = network.name_prefix
       name_postfix             = network.name_postfix
@@ -44,27 +44,45 @@ locals {
       }
     ]
   ])
-  compute_network_peerings = flatten([
+  compute_network_peerings_0 = flatten([
     for network in local.compute_networks : [
       for peering in network.compute_network_peerings : {
         name = coalesce(
           (peering.name != null ? peering.name : null),
           (peering.name_prefix != null ? peering.name_prefix : null),
           (network.name != null ? network.name : null),
-          (network.name_prefix != null ? "${network.name_prefix}-network" : null)
+          (network.name_prefix != null ? network.name_prefix : null)
         )
-        name_prefix             = peering.name_prefix
-        name_explicitly_defined = peering.name != null ? true : false
+        name_explicitly_set  = peering.name != null ? true : false
+        name_prefix          = peering.name_prefix
+        name_postfix         = coalesce(peering.name_postfix, "peering")
+        name_postfix_disable = peering.name_postfix_disable != null ? peering.name_postfix_disable : false
+        network_name         = network.name
         peer_network_name = coalesce(
           (peering.peer_network_name != null ? peering.peer_network_name : null),
-          (peering.peer_network_name_prefix != null ? "${peering.peer_network_name_prefix}-network" : null),
+          (peering.peer_network_name_prefix != null ? peering.peer_network_name_prefix : null),
         )
+        peer_network_name_explicitly_set    = peering.peer_network_name != null ? true : false
         peer_network_name_prefix            = peering.peer_network_name_prefix
+        peer_network_name_postfix           = coalesce(peering.peer_network_name_postfix, "network")
+        peer_network_name_postfix_disable   = peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable : false
         export_custom_routes                = peering.export_custom_routes
         import_custom_routes                = peering.import_custom_routes
         export_subnet_routes_with_public_ip = peering.export_subnet_routes_with_public_ip
         import_subnet_routes_with_public_ip = peering.import_subnet_routes_with_public_ip
       }
     ]
+  ])
+  compute_network_peerings = flatten([
+    for peering in local.compute_network_peerings_0 : {
+      name                                = peering.name_explicitly_set == true ? peering.name : "${peering.name}-to-${peering.peer_network_name}${peering.peer_network_name_postfix_disable == true ? "" : "-${peering.peer_network_name_postfix}"}${peering.name_postfix_disable == true ? "" : "-${peering.name_postfix}"}"
+      peer_network_name                   = peering.peer_network_name_explicitly_set == true ? peering.peer_network_name : "${peering.peer_network_name}${peering.peer_network_name_postfix_disable == true ? "" : "-${peering.peer_network_name_postfix}"}"
+      peer_network_name_postfix_disable   = peering.peer_network_name_postfix_disable
+      network_name                        = peering.network_name
+      export_custom_routes                = peering.export_custom_routes
+      import_custom_routes                = peering.import_custom_routes
+      export_subnet_routes_with_public_ip = peering.export_subnet_routes_with_public_ip
+      import_subnet_routes_with_public_ip = peering.import_subnet_routes_with_public_ip
+    }
   ])
 }

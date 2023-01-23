@@ -20,15 +20,28 @@ module "compute_networks" {
     {
       #name                    = "booyah"
       name_prefix = "amazing-app-spoke"
+      #name_postfix = "vpc"
       #name_postfix_disable    = true
       project                 = var.project
       auto_create_subnetworks = false
-      #compute_network_peerings = [
-      #  {
-      #    name                     = "booyah"
-      #    peer_network_name_prefix = "amazing-app-hub"
-      #  }
-      #]
+      compute_network_peerings = [
+        {
+          # works:
+          #name = "explicit-name"
+          # works:
+          #name_prefix = "boom"
+          # works:
+          #name_postfix = "vpc" # Default is "peering"
+          # works:
+          #name_postfix_disable     = true
+          # works:
+          peer_network_name_prefix = "amazing-app-hub"
+          # works:
+          peer_network_name_postfix = "vpc" # default is "network"
+          # works:
+          peer_network_name_postfix_disable = true
+        }
+      ]
       #compute_subnetworks = [
       #  {
       #    ip_cidr_range = "10.2.0.0/16"
@@ -50,6 +63,8 @@ module "compute_networks" {
     },
     {
       name_prefix             = "amazing-app-hub"
+      name_postfix            = "vpc"
+      name_postfix_disable    = true
       project                 = var.project
       auto_create_subnetworks = false
       #compute_subnetworks = [
