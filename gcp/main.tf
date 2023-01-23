@@ -42,24 +42,28 @@ module "compute_networks" {
           peer_network_name_postfix_disable = true
         }
       ]
-      #compute_subnetworks = [
-      #  {
-      #    ip_cidr_range = "10.2.0.0/16"
-      #    region        = "us-central1"
-      #    secondary_ip_range = [
-      #      {
-      #        ip_cidr_range = "192.168.10.0/24"
-      #      },
-      #      {
-      #        ip_cidr_range = "192.168.11.0/24"
-      #      }
-      #    ]
-      #  },
-      #  {
-      #    ip_cidr_range = "10.3.0.0/16"
-      #    region        = "us-central1"
-      #  }
-      #]
+      compute_subnetworks = [
+        {
+          # works:
+          #name_postfix = "snet"
+          # works:
+          #name_postfix_disable = true
+          ip_cidr_range = "10.2.0.0/16"
+          region        = "us-central1"
+          secondary_ip_range = [
+            {
+              ip_cidr_range = "192.168.10.0/24"
+            },
+            {
+              ip_cidr_range = "192.168.11.0/24"
+            }
+          ]
+        },
+        {
+          ip_cidr_range = "10.3.0.0/16"
+          region        = "us-central1"
+        }
+      ]
     },
     {
       name_prefix             = "amazing-app-hub"

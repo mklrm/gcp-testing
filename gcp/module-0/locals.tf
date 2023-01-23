@@ -30,9 +30,9 @@ locals {
         # network name prefix, in that order of preference, for naming.
         name = coalesce(
           (subnetwork.name != null ? subnetwork.name : null),
-          (subnetwork.name_prefix != null ? "${subnetwork.name_prefix}-subnet-${idx}" : null),
-          (network.name != null ? "${network.name}-subnet-${idx}" : null),
-          (network.name_prefix != null ? "${network.name_prefix}-subnet-${idx}" : null)
+          (subnetwork.name_prefix != null ? "${subnetwork.name_prefix}${subnetwork.name_postfix_disable == null ? subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet" : subnetwork.name_postfix_disable == true ? "" : subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet"}-${idx}" : null),
+          (network.name != null ? "${network.name}${subnetwork.name_postfix_disable == null ? subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet" : subnetwork.name_postfix_disable == true ? "" : subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet"}-${idx}" : null),
+          (network.name_prefix != null ? "${network.name_prefix}${subnetwork.name_postfix_disable == null ? subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet" : subnetwork.name_postfix_disable == true ? "" : subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet"}-${idx}" : null)
         )
         name_prefix         = subnetwork.name_prefix
         project             = network.project

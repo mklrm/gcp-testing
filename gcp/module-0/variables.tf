@@ -29,12 +29,12 @@ variable "compute_networks" {
       import_subnet_routes_with_public_ip = optional(bool)
     })))
     compute_subnetworks = optional(list(object({
-      # TODO Add a name_postfix string
-      # TODO Add a name_postfix_disable boolean
-      name          = optional(string)
-      name_prefix   = optional(string)
-      ip_cidr_range = optional(string) # TODO Pull off of a list if user doesn't pass this
-      region        = optional(string)
+      name                 = optional(string)
+      name_prefix          = optional(string)
+      name_postfix         = optional(string)
+      name_postfix_disable = optional(bool)
+      ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
+      region               = optional(string)
       secondary_ip_ranges = optional(list(object({
         # TODO Add a name_postfix string
         # TODO Add a name_postfix_disable boolean
