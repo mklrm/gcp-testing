@@ -50,11 +50,14 @@ module "compute_networks" {
           #name_postfix_disable = true
           ip_cidr_range = "10.2.0.0/16"
           region        = "us-central1"
-          secondary_ip_range = [
+          secondary_ip_ranges = [
             {
+              # works:
+              #range_name    = "x"
               ip_cidr_range = "192.168.10.0/24"
             },
             {
+              #range_name    = "y"
               ip_cidr_range = "192.168.11.0/24"
             }
           ]

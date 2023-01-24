@@ -38,9 +38,11 @@ variable "compute_networks" {
       secondary_ip_ranges = optional(list(object({
         # TODO Add a name_postfix string
         # TODO Add a name_postfix_disable boolean
-        range_name        = optional(string)
-        range_name_prefix = optional(string) # TODO Implement
-        ip_cidr_range     = optional(string) # TODO Pull off of a list if user doesn't pass this
+        range_name                 = optional(string)
+        range_name_prefix          = optional(string)
+        range_name_postfix         = optional(string)
+        range_name_postfix_disable = optional(bool)
+        ip_cidr_range              = optional(string) # TODO Pull off of a list if user doesn't pass this
       })))
     })))
   }))
