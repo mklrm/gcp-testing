@@ -14,8 +14,8 @@ provider "google" {
   # Configuration options
 }
 
-module "compute_networks" {
-  source = "./module-0"
+module "dynamic_deployment" {
+  source = "./module"
   compute_networks = [
     {
       #name                    = "booyah"
@@ -81,5 +81,27 @@ module "compute_networks" {
       #  }
       #]
     },
+  ]
+
+  compute_instances = [
+    {
+      name_prefix  = "compute-instance"
+      description  = "A compute instance"
+      machine_type = "e2-micro"
+      zone         = "us-central1-a"
+      project      = var.project
+
+      boot_disk = {
+        initialize_params = {
+          image = "debian-cloud/debian-11"
+        }
+      }
+
+      network_interface = [
+        {
+          network_name_prefix = "amazing-app-spoke"
+        }
+      ]
+    }
   ]
 }
