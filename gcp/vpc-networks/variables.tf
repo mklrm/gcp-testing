@@ -36,8 +36,6 @@ variable "compute_networks" {
       ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
       region               = optional(string)
       secondary_ip_ranges = optional(list(object({
-        # TODO Add a name_postfix string
-        # TODO Add a name_postfix_disable boolean
         range_name                 = optional(string)
         range_name_prefix          = optional(string)
         range_name_postfix         = optional(string)

@@ -1,3 +1,4 @@
+# TODO See if it would be possible to get rid of some of these flattenings
 locals {
   compute_networks_0 = flatten([
     for network in var.compute_networks : {
@@ -23,9 +24,11 @@ locals {
       compute_subnetworks      = network.compute_subnetworks
     }
   ])
-  compute_subnetworks = flatten([
+  compute_subnetworks_0 = flatten([
     for network in local.compute_networks : [
       for idx, subnetwork in network.compute_subnetworks : {
+        network_name        = network.name
+        network_name_prefix = network.name
         # Use coalesce to use subnet name, subnet name prefix, network name or 
         # network name prefix, in that order of preference, for naming.
         name = coalesce(
@@ -34,27 +37,39 @@ locals {
           (network.name != null ? "${network.name}${subnetwork.name_postfix_disable == null ? subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet" : subnetwork.name_postfix_disable == true ? "" : subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet"}-${idx}" : null),
           (network.name_prefix != null ? "${network.name_prefix}${subnetwork.name_postfix_disable == null ? subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet" : subnetwork.name_postfix_disable == true ? "" : subnetwork.name_postfix != null ? "-${subnetwork.name_postfix}" : "-subnet"}-${idx}" : null)
         )
-        name_prefix         = subnetwork.name_prefix
-        project             = network.project
-        ip_cidr_range       = subnetwork.ip_cidr_range
-        region              = subnetwork.region
-        network_name        = network.name
-        network_name_prefix = network.name
-        secondary_ip_ranges = subnetwork.secondary_ip_ranges == null ? [] : [
-          for ip_range in subnetwork.secondary_ip_ranges : {
-            # TODO This does not work because subnetwork name comes up null, create separate _0
-            # local, process subnetwork name there and then do this in a second locals loop
-            range_name = coalesce(
-              (ip_range.range_name != null ? ip_range.range_name : null),
-              (ip_range.range_name_prefix != null ? "${ip_range.range_name_prefix}${ip_range.name_postfix_disable == null ? ip_range.name_postfix != null ? "-${ip_range.name_postfix}" : "-secondary-range" : ip_range.name_postfix_disable == true ? "" : ip_range.name_postfix != null ? "-${ip_range.name_postfix}" : "-secondary-range"}-${idx}" : null),
-              (subnetwork.name != null ? "${subnetwork.name}${ip_range.name_postfix_disable == null ? ip_range.name_postfix != null ? "-${ip_range.name_postfix}" : "-secondary-range" : ip_range.name_postfix_disable == true ? "" : ip_range.name_postfix != null ? "-${ip_range.name_postfix}" : "-secondary-range"}-${idx}" : null),
-              (subnetwork.name_prefix != null ? "${subnetwork.name_prefix}${ip_range.name_postfix_disable == null ? ip_range.name_postfix != null ? "-${ip_range.name_postfix}" : "-secondary-range" : ip_range.name_postfix_disable == true ? "" : ip_range.name_postfix != null ? "-${ip_range.name_postfix}" : "-secondary-range"}-${idx}" : null)
-            )
-            ip_cidr_range = ip_range.ip_cidr_range
-          }
-        ]
+        name_prefix          = subnetwork.name_prefix
+        name_postfix         = subnetwork.name_postfix
+        name_postfix_disable = subnetwork.name_postfix_disable
+        project              = network.project
+        ip_cidr_range        = subnetwork.ip_cidr_range
+        region               = subnetwork.region
+        secondary_ip_ranges  = subnetwork.secondary_ip_ranges != null ? subnetwork.secondary_ip_ranges : []
       }
     ]
+  ])
+  compute_subnetworks = flatten([
+    for subnetwork in local.compute_subnetworks_0 : {
+      name                = subnetwork.name
+      name_prefix         = subnetwork.name_prefix
+      project             = subnetwork.project
+      ip_cidr_range       = subnetwork.ip_cidr_range
+      region              = subnetwork.region
+      network_name        = subnetwork.network_name
+      network_name_prefix = subnetwork.network_name
+      secondary_ip_ranges = subnetwork.secondary_ip_ranges == null ? [] : [
+        for idx, ip_range in subnetwork.secondary_ip_ranges : {
+          # TODO This does not work because subnetwork name comes up null, create separate _0
+          # local, process subnetwork name there and then do this in a second locals loop
+          range_name = coalesce(
+            (ip_range.range_name != null ? ip_range.range_name : null),
+            (ip_range.range_name_prefix != null ? "${ip_range.range_name_prefix}${ip_range.range_name_postfix_disable == null ? ip_range.range_name_postfix != null ? "-${ip_range.range_name_postfix}" : "-secondary-range" : ip_range.range_name_postfix_disable == true ? "" : ip_range.range_name_postfix != null ? "-${ip_range.range_name_postfix}" : "-secondary-range"}-${idx}" : null),
+            (subnetwork.name != null ? "${subnetwork.name}${ip_range.range_name_postfix_disable == null ? ip_range.range_name_postfix != null ? "-${ip_range.range_name_postfix}" : "-secondary-range" : ip_range.range_name_postfix_disable == true ? "" : ip_range.range_name_postfix != null ? "-${ip_range.range_name_postfix}" : "-secondary-range"}-${idx}" : null),
+            (subnetwork.name_prefix != null ? "${subnetwork.name_prefix}${ip_range.range_name_postfix_disable == null ? ip_range.range_name_postfix != null ? "-${ip_range.range_name_postfix}" : "-secondary-range" : ip_range.range_name_postfix_disable == true ? "" : ip_range.range_name_postfix != null ? "-${ip_range.range_name_postfix}" : "-secondary-range"}-${idx}" : null)
+          )
+          ip_cidr_range = ip_range.ip_cidr_range
+        }
+      ]
+    }
   ])
   compute_network_peerings_0 = flatten([
     for network in local.compute_networks : [
