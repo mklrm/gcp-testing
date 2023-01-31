@@ -97,6 +97,24 @@ provider "google" {
 #
 #--------------------------------------------------------------------------------#
 #
+# Values:
+#                 network_name_prefix = potato
+#                   subnetwork_0_name = carrot
+# subnetwork_0_secondary_range_0_name = plum
+#
+# Generated names:
+#                        network_name: potato-network
+#
+#                   subnetwork_0_name: potato-network-carrot
+# subnetwork_0_secondary_range_name_0: potato-network-carrot-plum
+# subnetwork_0_secondary_range_name_1: potato-network-carrot-secondary-range-1
+#
+#                   subnetwork_1_name: potato-network-subnet-1
+# subnetwork_1_secondary_range_name_0: potato-network-subnet-0-secondary-range-0
+# subnetwork_1_secondary_range_name_1: potato-network-subnet-0-secondary-range-1
+#
+#--------------------------------------------------------------------------------#
+#
 # Notes
 # - Remove postfix and postfix_disable from subnetwork and secondary_range, not worth the trouble
 # - Add disable_prefix to subnet and secondary ip range
