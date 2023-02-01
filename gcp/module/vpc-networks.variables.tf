@@ -2,6 +2,8 @@ variable "compute_networks" {
   default     = []
   description = "Compute networks and networking connected resources"
   type = list(object({
+    # TODO Probably should remove peer_network_name_postfix, _disable too 
+    #      and add peer_network_name_prefix_disable
     # TODO Add a name_postfix_disable_propagate boolean that applies the setting to sub objects
     # TODO Add a boolean to determine if a random string will be baked into names
     # TODO Test name generation thoroughly
@@ -31,6 +33,7 @@ variable "compute_networks" {
     compute_subnetworks = optional(list(object({
       name                 = optional(string)
       name_prefix          = optional(string)
+      name_prefix_disable  = optional(bool)
       name_postfix         = optional(string)
       name_postfix_disable = optional(bool)
       ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
@@ -38,6 +41,7 @@ variable "compute_networks" {
       secondary_ip_ranges = optional(list(object({
         range_name                 = optional(string)
         range_name_prefix          = optional(string)
+        range_name_prefix_disable  = optional(bool)
         range_name_postfix         = optional(string)
         range_name_postfix_disable = optional(bool)
         ip_cidr_range              = optional(string) # TODO Pull off of a list if user doesn't pass this

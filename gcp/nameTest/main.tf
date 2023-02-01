@@ -1,19 +1,3 @@
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "4.49.0"
-    }
-  }
-  backend "local" {
-    path = "state/terraform.tfstate"
-  }
-}
-
-provider "google" {
-  # Configuration options
-}
-
 # Name generation design
 #
 # Values:
@@ -118,97 +102,85 @@ provider "google" {
 # Notes
 # - Remove postfix and postfix_disable from subnetwork and secondary_range, not worth the trouble
 # - Add disable_prefix to subnet and secondary ip range
+# - It would be nice to be able to output a custom error when neither a network_name or 
+#   network_name_prefix are provided but what you get without isn't too bad either
 #
 
-module "dynamic_deployment" {
-  source = "./module"
-  compute_networks = [
-    {
-      #name                    = "booyah"
-      name_prefix = "amazing-app-spoke"
-      #name_postfix = "vpc"
-      #name_postfix_disable    = true
-      project                 = var.project
-      auto_create_subnetworks = false
-      compute_network_peerings = [
-        {
-          # works:
-          #name = "explicit-name"
-          # works:
-          #name_prefix = "boom"
-          # works:
-          #name_postfix = "vpc" # Default is "peering"
-          # works:
-          #name_postfix_disable     = true
-          # works:
-          peer_network_name_prefix = "amazing-app-hub"
-          # works:
-          peer_network_name_postfix = "vpc" # default is "network"
-          # works:
-          peer_network_name_postfix_disable = true
-        }
-      ]
-      compute_subnetworks = [
-        {
-          # works:
-          #name_postfix = "snet"
-          # works:
-          #name_postfix_disable = true
-          name_prefix_disable = true
-          ip_cidr_range       = "10.2.0.0/16"
-          region              = "us-central1"
-          secondary_ip_ranges = [
-            {
-              # works:
-              #range_name    = "x"
-              ip_cidr_range = "192.168.10.0/24"
-            },
-            {
-              #range_name    = "y"
-              ip_cidr_range = "192.168.11.0/24"
-            }
-          ]
-        },
-        {
-          ip_cidr_range = "10.3.0.0/16"
-          region        = "us-central1"
-        }
-      ]
-    },
-    {
-      name_prefix             = "amazing-app-hub"
-      name_postfix            = "vpc"
-      name_postfix_disable    = true
-      project                 = var.project
-      auto_create_subnetworks = false
-      #compute_subnetworks = [
-      #  {
-      #    ip_cidr_range = "10.4.0.0/16"
-      #    region        = "us-central1"
-      #  }
-      #]
-    },
-  ]
-
-  compute_instances = [
-    {
-      name_prefix  = "compute-instance"
-      description  = "A compute instance"
-      machine_type = "e2-micro"
-      zone         = "us-central1-a"
-      project      = var.project
-
-      boot_disk = {
-        initialize_params = {
-          image = "debian-cloud/debian-11"
-        }
-      }
-
-      network_interface = [
-        {
-          network_name_prefix = "amazing-app-spoke"
-        }
-      ]
-    }
-  ]
+variable "network_name" {
+  default = null
+  type    = string
 }
+
+variable "network_name_prefix" {
+  default = null
+  type    = string
+}
+
+variable "network_name_postfix" {
+  default = null
+  type    = string
+}
+
+variable "network_name_postfix_disable" {
+  default = null
+  type    = bool
+}
+
+variable "subnetwork_name" {
+  default = null
+  type    = string
+}
+
+variable "subnetwork_name_prefix" {
+  default = null
+  type    = string
+}
+
+variable "subnetwork_name_prefix_disable" {
+  default = null
+  type    = string
+}
+
+locals {
+  network_name = coalesce(
+    # If network name was explicitly provided, use as is
+    var.network_name,
+    # If network name postfix disable was set to true, use network name prefix as is
+    var.network_name_postfix_disable != null ? var.network_name_postfix_disable == true ? var.network_name_prefix : null : null,
+    # Try returning "network name-network name postfix", return null if 
+    # one or the other wasn't provided
+    try(
+      "${var.network_name_prefix}-${var.network_name_postfix}",
+      null
+    ),
+    # Finally attempt to return "network name-default postfix"
+    try(
+      "${var.network_name_prefix}${"-network"}",
+      null
+    )
+  )
+}
+
+output "network_name" {
+  value = local.network_name
+}
+
+#output "network_name" {
+#  value = coalesce(
+#    # If network name was explicitly provided, use as is
+#    var.network_name,
+#    # If network name postfix disable was set to true, use network name prefix as is
+#    var.network_name_postfix_disable != null ? var.network_name_postfix_disable == true ? var.network_name_prefix : null : null,
+#    # Try returning "network name-network name postfix", return null if 
+#    # one or the other wasn't provided
+#    try(
+#      "${var.network_name_prefix}-${var.network_name_postfix}",
+#      null
+#    ),
+#    # Finally attempt to return "network name-default postfix"
+#    try(
+#      "${var.network_name_prefix}${"-network"}",
+#      null
+#    )
+#  )
+#}
