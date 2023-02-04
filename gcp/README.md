@@ -26,7 +26,7 @@
 
                    subnetwork_1_name: tomato-network-subnet-1
 
---------------------------------------------------------------------------------#
+---
 
  Values:
           network_name_prefix = olive
@@ -41,7 +41,7 @@
 
                    subnetwork_1_name: olive-subnet-1
 
---------------------------------------------------------------------------------#
+---
 
  Values:
                     network_name_prefix = potato
@@ -60,7 +60,7 @@
  subnetwork_1_secondary_range_name_0: potato-subnet-0-kiwi-0
  subnetwork_1_secondary_range_name_1: potato-subnet-0-kiwi-1
 
---------------------------------------------------------------------------------#
+---
 
  Values:
                             network_name_prefix = potato
@@ -79,7 +79,7 @@
  subnetwork_1_secondary_range_name_0: potato-subnet-0-0
  subnetwork_1_secondary_range_name_1: potato-subnet-0-1
 
---------------------------------------------------------------------------------#
+---
 
  Values:
                  network_name_prefix = potato
@@ -97,7 +97,7 @@
  subnetwork_1_secondary_range_name_0: potato-network-subnet-0-secondary-range-0
  subnetwork_1_secondary_range_name_1: potato-network-subnet-0-secondary-range-1
 
---------------------------------------------------------------------------------#
+---
 
  Notes
  - Remove postfix and postfix_disable from subnetwork and secondary_range, not worth the trouble
@@ -115,7 +115,7 @@
 
                    subnetwork_0_name: potato-network-carrot
 
---------------------------------------------------------------------------------#
+---
 
  Peering names
  Default:
