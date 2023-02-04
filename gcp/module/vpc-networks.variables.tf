@@ -1,6 +1,30 @@
 # TODO Add name prefix and postfix variables with defaults
 # TODO Add a separate compute_networks name_prefix_disable_propagate that compute_networks will use
 
+variable "compute_network_default_postfix" {
+  default     = "network"
+  description = "Default postfix for VPC names"
+  type        = string
+}
+
+variable "compute_subnetwork_default_prefix" {
+  default     = "snet"
+  description = "Default prefix for subnetwork names"
+  type        = string
+}
+
+variable "compute_network_peering_default_postfix" {
+  default     = "peering"
+  description = "Default prefix for VPC peerings"
+  type        = string
+}
+
+variable "compute_subnetwork_secondary_range_default_postfix" {
+  default     = "secondary-range"
+  description = "Default prefix for subnetwork secondary range names"
+  type        = string
+}
+
 variable "compute_networks" {
   default     = []
   description = "Compute networks and networking connected resources"

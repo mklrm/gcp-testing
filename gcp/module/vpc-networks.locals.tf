@@ -13,13 +13,15 @@ locals {
         # one or the other wasn't provided
         # TODO Use try(network.name_postfix, "network") to generage the postfix and 
         # get rid of the second try
+        # - Or not, because this is terraform and it doesn't work, maybe try again
+        #   at some point...
         try(
           "${network.name_prefix}-${network.name_postfix}",
           null
         ),
         # Finally attempt to return "network name-default postfix"
         try(
-          "${network.name_prefix}-network",
+          "${network.name_prefix}-${var.compute_network_default_postfix}",
           null
         )
       )
@@ -44,7 +46,7 @@ locals {
             ? try("${network.name}-${idx}", null)
             : try("${network.name}-${subnetwork.name_prefix}-${idx}", null)
             : try("${network.name}-${subnetwork.name_prefix}-${idx}", null),
-            try("${network.name}-subnet-${idx}", null)
+            try("${network.name}-${var.compute_subnetwork_default_prefix}-${idx}", null)
           )
           secondary_ip_ranges = subnetwork.secondary_ip_ranges
         }
@@ -78,7 +80,7 @@ locals {
                     null
                   ),
                   try(
-                    "${peering.peer_network_name_prefix}-network",
+                    "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
                     null
                   )
                 )
@@ -96,7 +98,7 @@ locals {
                     null
                   ),
                   try(
-                    "${peering.peer_network_name_prefix}-network",
+                    "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
                     null
                   )
                 )
@@ -108,13 +110,13 @@ locals {
             ? peering.name_postfix_disable == false
             ? peering.name_postfix != null
             ? "-${peering.name_postfix}"
-            : "-peering"
+            : "-${var.compute_network_peering_default_postfix}"
             # peering.name_postfix_disable == true:
             : ""
             # peering.name_postfix_disable == null:
             : peering.name_postfix != null
             ? "-${peering.name_postfix}"
-            : "-peering"
+            : "${var.compute_network_peering_default_postfix}"
             }${
             peering.name_idx_enable != null
             ? peering.name_idx_enable == true
@@ -132,7 +134,7 @@ locals {
               null
             ),
             try(
-              "${peering.peer_network_name_prefix}-network",
+              "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
               null
             )
           )
@@ -160,7 +162,7 @@ locals {
                 ? try("${subnetwork.name}-${idx}", null)
                 : try("${subnetwork.name}-${secondary_range.range_name_prefix}-${idx}", null)
                 : try("${subnetwork.name}-${secondary_range.range_name_prefix}-${idx}", null),
-                try("${subnetwork.name}-secondary-range-${idx}", null)
+                try("${subnetwork.name}-${var.compute_subnetwork_secondary_range_default_postfix}-${idx}", null)
               )
               ip_cidr_range = secondary_range.ip_cidr_range
             }
