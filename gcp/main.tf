@@ -174,56 +174,29 @@ module "dynamic_deployment" {
   source = "./module"
   compute_networks = [
     {
-      #name                    = "booyah"
-      name_prefix = "amazing-app-spoke"
-      #name_postfix = "vpc"
-      #name_postfix_disable    = true
+      name_prefix             = "amazing-app-spoke"
       project                 = var.project
       auto_create_subnetworks = false
       compute_network_peerings = [
         {
-          # works:
-          #name = "explicit-name"
-          # works:
-          #name_prefix = "boom"
-          # works
-          #name_prefix_disable = true
-          # works:
-          name_postfix = "pairing" # Default is "peering"
-          # works:
-          #name_postfix_disable = true
-          # works:
-          #peer_network_name = "amazing-app-hub"
-          # works:
-          peer_network_name_prefix = "amazing-app-hub"
-          # works:
-          peer_network_name_postfix = "vpc" # default is "network"
-          # works:
+          name_postfix                      = "pairing"
+          peer_network_name_prefix          = "amazing-app-hub"
+          peer_network_name_postfix         = "vpc"
           peer_network_name_postfix_disable = true
-          # works
-          name_idx_enable = true
+          name_idx_enable                   = true
         }
       ]
       compute_subnetworks = [
         {
-          # works:
-          name_prefix = "snet"
-          # works:
-          #name_prefix_disable = true
+          name_prefix   = "snet"
           ip_cidr_range = "10.2.0.0/16"
           region        = "us-central1"
           secondary_ip_ranges = [
             {
-              # works:
-              #range_name    = "x"
-              # works:
-              #range_name_prefix_disable = true
-              # works:
               range_name_prefix = "x"
               ip_cidr_range     = "192.168.10.0/24"
             },
             {
-              #range_name    = "y"
               ip_cidr_range = "192.168.11.0/24"
             }
           ]
@@ -240,12 +213,6 @@ module "dynamic_deployment" {
       name_postfix_disable    = true
       project                 = var.project
       auto_create_subnetworks = false
-      #compute_subnetworks = [
-      #  {
-      #    ip_cidr_range = "10.4.0.0/16"
-      #    region        = "us-central1"
-      #  }
-      #]
     },
   ]
 
