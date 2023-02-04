@@ -15,10 +15,7 @@ resource "google_compute_subnetwork" "compute_subnetworks" {
   dynamic "secondary_ip_range" {
     for_each = each.value.secondary_ip_ranges[*]
     content {
-      range_name = coalesce(
-        (secondary_ip_range.value.range_name != null ? secondary_ip_range.value.range_name : null),
-        (each.value.name != null ? "${each.value.name}-secondary-range-${secondary_ip_range.key}" : null),
-      )
+      range_name    = secondary_ip_range.value.name
       ip_cidr_range = secondary_ip_range.value.ip_cidr_range
     }
   }
