@@ -151,12 +151,11 @@ module "dynamic_deployment" {
       compute_subnetworks = [
         {
           # works:
-          #name_postfix = "snet"
+          name_prefix = "snet"
           # works:
-          #name_postfix_disable = true
-          name_prefix_disable = true
-          ip_cidr_range       = "10.2.0.0/16"
-          region              = "us-central1"
+          #name_prefix_disable = true
+          ip_cidr_range = "10.2.0.0/16"
+          region        = "us-central1"
           secondary_ip_ranges = [
             {
               # works:

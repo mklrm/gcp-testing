@@ -27,21 +27,11 @@ locals {
         for idx, subnetwork in network.compute_subnetworks : {
           name = coalesce(
             subnetwork.name,
-            #coalesce(
-            #"${network.name}-${subnetwork.name_prefix_disable != null ? subnetwork.name_prefix_disable == true ? null : subnetwork.name_prefix : subnetwork.name_prefix}-${idx}",
-            # TODO Test if this works, the above approaches were giving me grief because of 
-            # null values in string interpolation, perhaps I can do something like this instead:
-            join(
-              "-",
-              subnetwork.name_prefix_disable != null ? subnetwork.name_prefix_disable == true ? null : network.name : network.name,
-              subnetwork.name_prefix_disable != null ? subnetwork.name_prefix_disable == true ? null : subnetwork.name_prefix : subnetwork.name_prefix,
-              subnetwork.name_prefix_disable != null ? subnetwork.name_prefix_disable == true ? null : idx : idx,
-            ),
-            #),
-            try(
-              "${network.name}-${subnetwork.name_prefix}-${idx}",
-              null
-            ),
+            subnetwork.name_prefix_disable != null
+            ? subnetwork.name_prefix_disable == true
+            ? try("${network.name}-${idx}", null)
+            : try("${network.name}-${subnetwork.name_prefix}-${idx}", null)
+            : try("${network.name}-${subnetwork.name_prefix}-${idx}", null),
             try(
               "${network.name}-subnet-${idx}",
               null
