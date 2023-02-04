@@ -12,7 +12,7 @@
 
                    subnetwork_0_name: cucumber-subnet-1
 
---------------------------------------------------------------------------------#
+---
 
  Values:
  network_name_prefix = tomato
