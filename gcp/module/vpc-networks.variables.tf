@@ -1,3 +1,5 @@
+# TODO Add name prefix and postfix variables with defaults
+
 variable "compute_networks" {
   default     = []
   description = "Compute networks and networking connected resources"
@@ -39,6 +41,7 @@ variable "compute_networks" {
       ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
       region               = optional(string)
       secondary_ip_ranges = optional(list(object({
+        # TODO Remove range_ prefix from variable names
         range_name                 = optional(string)
         range_name_prefix          = optional(string)
         range_name_prefix_disable  = optional(bool)

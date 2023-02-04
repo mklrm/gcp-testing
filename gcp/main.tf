@@ -160,7 +160,11 @@ module "dynamic_deployment" {
             {
               # works:
               #range_name    = "x"
-              ip_cidr_range = "192.168.10.0/24"
+              # works:
+              #range_name_prefix_disable = true
+              # works:
+              range_name_prefix = "x"
+              ip_cidr_range     = "192.168.10.0/24"
             },
             {
               #range_name    = "y"

@@ -21,8 +21,9 @@ locals {
       compute_subnetworks = network.compute_subnetworks == null ? [] : network.compute_subnetworks
     }
   ]
-  compute_network_names = [
+  compute_network_names_1 = [
     for network in local.compute_network_names_0 : {
+      name = network.name
       compute_subnetwork_names = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
           name = coalesce(
@@ -32,11 +33,32 @@ locals {
             ? try("${network.name}-${idx}", null)
             : try("${network.name}-${subnetwork.name_prefix}-${idx}", null)
             : try("${network.name}-${subnetwork.name_prefix}-${idx}", null),
-            try(
-              "${network.name}-subnet-${idx}",
-              null
-            )
+            try("${network.name}-subnet-${idx}", null)
           )
+          secondary_ip_ranges = subnetwork.secondary_ip_ranges
+        }
+      ]
+    }
+  ]
+  compute_network_names = [
+    for network in local.compute_network_names_1 : {
+      name = network.name
+      compute_subnetwork_names = network.compute_subnetwork_names == null ? [] : [
+        for idx, subnetwork in network.compute_subnetwork_names : {
+          name = subnetwork.name
+          compute_subnetwork_secondary_range_names = subnetwork.secondary_ip_ranges == null ? [] : [
+            for idx, secondary_range in subnetwork.secondary_ip_ranges : {
+              name = coalesce(
+                secondary_range.range_name,
+                secondary_range.range_name_prefix_disable != null
+                ? secondary_range.range_name_prefix_disable == true
+                ? try("${subnetwork.name}-${idx}", null)
+                : try("${subnetwork.name}-${secondary_range.range_name_prefix}-${idx}", null)
+                : try("${subnetwork.name}-${secondary_range.range_name_prefix}-${idx}", null),
+                try("${subnetwork.name}-secondary-range-${idx}", null)
+              )
+            }
+          ]
         }
       ]
     }
