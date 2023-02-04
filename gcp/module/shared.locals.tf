@@ -18,7 +18,8 @@ locals {
           null
         )
       )
-      compute_subnetworks = network.compute_subnetworks == null ? [] : network.compute_subnetworks
+      compute_subnetworks      = network.compute_subnetworks == null ? [] : network.compute_subnetworks
+      compute_network_peerings = network.compute_network_peerings == null ? [] : network.compute_network_peerings
     }
   ]
   compute_network_names_1 = [
@@ -36,6 +37,76 @@ locals {
             try("${network.name}-subnet-${idx}", null)
           )
           secondary_ip_ranges = subnetwork.secondary_ip_ranges
+        }
+      ]
+      compute_network_peering_names = network.compute_network_peerings == null ? [] : [
+        for idx, peering in network.compute_network_peerings : {
+          name                 = peering.name
+          name_prefix_disable  = peering.name_prefix_disable
+          name_postfix_disable = peering.name_postfix_disable
+          name_idx_enable      = peering.name_idx_enable
+          # TODO It would simplify lots of things if I was able to get around 
+          # having to check if a variable is null before checking what the 
+          # value is like I do here:
+          name_prefix = (
+            peering.name_prefix_disable != null
+            ? peering.name_prefix_disable == true
+            ? ""
+            : coalesce(
+              try("${peering.name_prefix}", null),
+              try("${network.name}-to-${
+                coalesce(
+                  peering.peer_network_name,
+                  peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
+                  try(
+                    "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
+                    null
+                  ),
+                  try(
+                    "${peering.peer_network_name_prefix}-network",
+                    null
+                  )
+                )
+              }", null),
+            )
+            : coalesce(
+              try("${peering.name_prefix}", null),
+              try("${network.name}-to-${
+                coalesce(
+                  peering.peer_network_name,
+                  peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
+                  try(
+                    "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
+                    null
+                  ),
+                  try(
+                    "${peering.peer_network_name_prefix}-network",
+                    null
+                  )
+                )
+              }", null),
+            )
+          )
+          name_postfix = "${
+            peering.name_postfix_disable != null
+            ? peering.name_postfix_disable == false
+            ? peering.name_postfix != null
+            ? "-${peering.name_postfix}"
+            : "-peering"
+            # peering.name_postfix_disable == true:
+            : ""
+            # peering.name_postfix_disable == null:
+            : peering.name_postfix != null
+            ? "-${peering.name_postfix}"
+            : "-peering"
+            }${
+            peering.name_idx_enable != null
+            ? peering.name_idx_enable == true
+            ? "-${idx}"
+            : ""
+            # peering.name_idx_enable == false:
+            : ""
+          }"
         }
       ]
     }
@@ -59,6 +130,26 @@ locals {
               )
             }
           ]
+        }
+      ]
+      compute_network_peering_names = network.compute_network_peering_names == null ? [] : [
+        for idx, peering in network.compute_network_peering_names : {
+          name = coalesce(
+            peering.name,
+            # If prefix and postfix are disabled and idx_enable isn't set, return idx:
+            peering.name_prefix_disable != null
+            ? peering.name_prefix_disable == true
+            ? peering.name_postfix_disable != null
+            ? peering.name_postfix_disable == true
+            ? peering.name_idx_enable == null
+            ? "${idx}"
+            : null
+            : null
+            : null
+            : null
+            : null,
+            "${peering.name_prefix}${peering.name_postfix}"
+          )
         }
       ]
     }

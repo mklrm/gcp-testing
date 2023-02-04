@@ -120,6 +120,56 @@ provider "google" {
 # - Add disable_prefix to subnet and secondary ip range
 #
 
+# PEERINGS NAME GENERATION
+#
+# Values:
+#                 network_name_prefix = potato
+#                   subnetwork_0_name = carrot
+# subnetwork_0_secondary_range_0_name = plum
+#
+# Generated names:
+#                        network_name: potato-network
+#
+#                   subnetwork_0_name: potato-network-carrot
+#
+#--------------------------------------------------------------------------------#
+#
+
+# Peering names
+# Default:
+# network_name-to-peer_network_name-peering
+#
+# prefix == pearAppleNuts:
+# pearAppleNuts-peering
+#
+# prefix_disable:
+# peering-idx
+#
+# prefix_disable, idx_disable:
+# peering
+#
+# postfix == pairing
+# network_name-to-peer_network_name-pairing
+#
+# postix_disabled:
+# network_name-to-peer_network_name
+#
+# prefix_disabled, postfix_disabled:
+# idx
+#
+# prefix_disabled, potfix_disabled, idx-disabled:
+# Can't generate, maybe make it a random string
+#
+# peer_network_name_disabled:
+# network_name-peering-idx
+#
+# peer_network_name_disabled, idx_disabled:
+# network_name-peering
+#
+# peer_network_name_disabled, idx_disabled, postfix_disabled:
+# network_name
+#
+
 module "dynamic_deployment" {
   source = "./module"
   compute_networks = [
@@ -136,16 +186,22 @@ module "dynamic_deployment" {
           #name = "explicit-name"
           # works:
           #name_prefix = "boom"
+          # works
+          #name_prefix_disable = true
           # works:
-          #name_postfix = "vpc" # Default is "peering"
+          name_postfix = "pairing" # Default is "peering"
           # works:
-          #name_postfix_disable     = true
+          #name_postfix_disable = true
+          # works:
+          #peer_network_name = "amazing-app-hub"
           # works:
           peer_network_name_prefix = "amazing-app-hub"
           # works:
           peer_network_name_postfix = "vpc" # default is "network"
           # works:
           peer_network_name_postfix_disable = true
+          # works
+          name_idx_enable = true
         }
       ]
       compute_subnetworks = [
