@@ -13,7 +13,7 @@
                    subnetwork_0_name: cucumber-subnet-1
 ```
 ---
-
+```
  Values:
  network_name_prefix = tomato
 
@@ -25,9 +25,9 @@
  subnetwork_0_secondary_range_name_1: tomato-network-subnet-0-secondary-range-1
 
                    subnetwork_1_name: tomato-network-subnet-1
-
+```
 ---
-
+```
  Values:
           network_name_prefix = olive
  network_name_postfix_disable = true
@@ -40,9 +40,9 @@
  subnetwork_0_secondary_range_name_1: olive-subnet-0-secondary-range-1
 
                    subnetwork_1_name: olive-subnet-1
-
+```
 ---
-
+```
  Values:
                     network_name_prefix = potato
            network_name_postfix_disable = true
@@ -59,9 +59,9 @@
                    subnetwork_1_name: potato-subnet-1
  subnetwork_1_secondary_range_name_0: potato-subnet-0-kiwi-0
  subnetwork_1_secondary_range_name_1: potato-subnet-0-kiwi-1
-
+```
 ---
-
+```
  Values:
                             network_name_prefix = potato
                    network_name_postfix_disable = true
@@ -78,9 +78,9 @@
                    subnetwork_1_name: potato-subnet-1
  subnetwork_1_secondary_range_name_0: potato-subnet-0-0
  subnetwork_1_secondary_range_name_1: potato-subnet-0-1
-
+```
 ---
-
+```
  Values:
                  network_name_prefix = potato
                    subnetwork_0_name = carrot
@@ -96,9 +96,9 @@
                    subnetwork_1_name: potato-network-subnet-1
  subnetwork_1_secondary_range_name_0: potato-network-subnet-0-secondary-range-0
  subnetwork_1_secondary_range_name_1: potato-network-subnet-0-secondary-range-1
-
+```
 ---
-
+```
  Notes
  - Remove postfix and postfix_disable from subnetwork and secondary_range, not worth the trouble
  - Add disable_prefix to subnet and secondary ip range
@@ -114,9 +114,9 @@
                         network_name: potato-network
 
                    subnetwork_0_name: potato-network-carrot
-
+```
 ---
-
+```
  Peering names
  Default:
  network_name-to-peer_network_name-peering
@@ -150,4 +150,4 @@
 
  peer_network_name_disabled, idx_disabled, postfix_disabled:
  network_name
-
+```
