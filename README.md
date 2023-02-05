@@ -1,2 +1,2 @@
-# terraform-testing
-Testing and learning Terraform
+# Testing and learning things related to Google Cloud Platform and 
+Such as Terraform and Ansible
