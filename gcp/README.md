@@ -1,8 +1,9 @@
 # TODO
 - Try using labels or networks tags to attach a VM to a subnet
-  - Apparently you can't attach either to a subnet
-    - Maybe I'll just roll my own tags then
-
+ - Apparently you can't attach either to a subnet
+  - Maybe I'll just roll my own tags then
+   - Or I could add a standard label to the VM and a custom marker to the subnet
+ 
 # Name generation design
 ```
  Values:

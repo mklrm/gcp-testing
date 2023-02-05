@@ -46,3 +46,27 @@ resource "google_compute_network_peering" "compute_network_peerings" {
   #  #}
   #}
 }
+
+resource "google_compute_firewall" "iap-rules" {
+  for_each = { for network in local.compute_networks : network.name => network
+    if(
+      network.add_iap_firewall_rule != null
+      ? network.add_iap_firewall_rule == true
+      ? true
+      : false
+      : true
+    )
+  }
+  project     = var.project
+  name        = "${each.value.name}-allow-iap"
+  network     = each.value.name
+  description = "Allows access through IAP to instances tagged with allow-iap"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["35.235.240.0/20"]
+  target_tags   = ["allow-iap"]
+}

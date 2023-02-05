@@ -4,6 +4,7 @@ locals {
     for network in var.compute_networks : {
       project                 = network.project
       auto_create_subnetworks = network.auto_create_subnetworks
+      add_iap_firewall_rule   = network.add_iap_firewall_rule
       name = coalesce(
         # If network name was explicitly provided, use as is
         network.name,
@@ -34,6 +35,7 @@ locals {
       name                    = network.name
       project                 = network.project
       auto_create_subnetworks = network.auto_create_subnetworks
+      add_iap_firewall_rule   = network.add_iap_firewall_rule
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
           project       = network.project
@@ -147,6 +149,7 @@ locals {
       name                    = network.name
       project                 = network.project
       auto_create_subnetworks = network.auto_create_subnetworks
+      add_iap_firewall_rule   = network.add_iap_firewall_rule
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
           name          = subnetwork.name

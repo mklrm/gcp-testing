@@ -41,6 +41,7 @@ variable "compute_networks" {
     name_postfix_disable    = optional(bool)
     project                 = optional(string)
     auto_create_subnetworks = optional(bool)
+    add_iap_firewall_rule   = optional(bool)
     compute_subnetworks = optional(list(object({
       name                 = optional(string)
       name_prefix          = optional(string)

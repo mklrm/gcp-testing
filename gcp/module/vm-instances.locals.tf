@@ -3,7 +3,7 @@ locals {
     for idx, instance in var.compute_instances : {
       name = coalesce(
         instance.name != null ? instance.name : null,
-        instance.name_postfix_disable != null ? instance.name_postfix_disable == false ? "${instance.name_prefix}-${idx}-${instance.name_postfix != null ? instance.name_postfix : "vm"}" : "${instance.name_prefix}-${idx}" : "${instance.name_prefix}-${idx}-${instance.name_postfix != null ? instance.name_postfix : "-vm"}"
+        instance.name_postfix_disable != null ? instance.name_postfix_disable == false ? "${instance.name_prefix}-${idx}-${instance.name_postfix != null ? instance.name_postfix : "vm"}" : "${instance.name_prefix}-${idx}" : "${instance.name_prefix}-${idx}-${instance.name_postfix != null ? instance.name_postfix : "vm"}"
       )
       name_prefix                       = instance.name_prefix
       name_postfix                      = instance.name_postfix
@@ -13,10 +13,7 @@ locals {
       zone                              = instance.zone
       network_interface = instance.network_interface == null ? [] : [
         for idx, network_interface in instance.network_interface : {
-          network_name = coalesce(
-            network_interface.network_name != null ? network_interface.network_name : null,
-            network_interface.network_name_postfix_disable != null ? network_interface.network_name_postfix_disable == false ? "${network_interface.network_name_prefix}-${network_interface.network_name_postfix != null ? network_interface.network_name_postfix : "network"}" : "${network_interface.network_name_prefix}" : "${network_interface.network_name_prefix}-${network_interface.network_name_postfix != null ? network_interface.network_name_postfix : "network"}"
-          )
+          subnetwork = network_interface.subnetwork != null ? network_interface.subnetwork : null,
         }
       ]
       allow_stopping_for_update    = instance.allow_stopping_for_update
