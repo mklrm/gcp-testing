@@ -59,7 +59,7 @@ resource "google_compute_firewall" "iap-rules" {
   }
   project     = var.project
   name        = "${each.value.name}-allow-iap"
-  network     = each.value.name
+  network     = resource.google_compute_network.compute_networks[each.value.name].self_link
   description = "Allows access through IAP to instances tagged with allow-iap"
 
   allow {
