@@ -1,0 +1,43 @@
+---
+plugin: gcp_compute
+auth_kind: application
+projects:
+  # This value will be subsituted by sed command
+  - playground-s-11-b692b9f7
+keyed_groups:
+  # Create groups from GCE labels
+  - key: labels
+    prefix: gcp
+  - key: labels
+    prefix: label
+  - key: zone
+    prefix: zone
+  - key: (tags.items|list)
+    prefix: tag
+hostnames:
+  # List host by name instead of the default public ip
+  - name
+compose:
+  # Set an inventory parameter to use the Public IP address to connect to the host
+  # For Private ip use "networkInterfaces[0].networkIP"
+  #ansible_host: networkInterfaces[0].accessConfigs[0].natIP
+  # set the ansible_host variable to connect with the private IP address without changing the hostname
+  ansible_host: name
+
+
+#plugin: gcp_compute
+#projects:
+#  - my-project
+#auth_kind: application
+#keyed_groups:
+#  - key: labels
+#    prefix: label
+#  - key: zone
+#    prefix: zone
+#  - key: (tags.items|list)
+#    prefix: tag
+#groups:
+#  gke          : "'gke' in name"
+#compose:
+#  # set the ansible_host variable to connect with the private IP address without changing the hostname
+#  ansible_host: name

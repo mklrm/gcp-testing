@@ -30,3 +30,6 @@ override.tf.json
 
 # Ignore .auto.tfvars files
 *.auto.tfvars
+
+# GCP Service account key-file
+key-file
