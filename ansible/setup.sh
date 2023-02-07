@@ -1,9 +1,8 @@
 #!/bin/fish
 set -x
 # Based on https://github.com/GoogleCloudPlatform/google-cloud-ops-agents-ansible/blob/master/tutorial/tutorial.md
-export PROJECT_ID="playground-s-11-b692b9f7"
-#export SERVICE_ACCOUNT_ID="cli-service-account-1@playground-s-11-9c7ff3ce.iam.gserviceaccount.com"
-export SERVICE_ACCOUNT_EMAIL="cli-service-account-1@playground-s-11-b692b9f7.iam.gserviceaccount.com"
+export PROJECT_ID="playground-s-11-b3788056"
+export SERVICE_ACCOUNT_EMAIL="cli-service-account-1@playground-s-11-b3788056.iam.gserviceaccount.com"
 
 gcloud config set project $PROJECT_ID
 #gcloud iam service-accounts keys create $PWD/misc/key-file --iam-account=$SERVICE_ACCOUNT_EMAIL

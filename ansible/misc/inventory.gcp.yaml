@@ -3,7 +3,7 @@ plugin: gcp_compute
 auth_kind: application
 projects:
   # This value will be subsituted by sed command
-  - playground-s-11-b692b9f7
+  - playground-s-11-b3788056
 keyed_groups:
   # Create groups from GCE labels
   - key: labels
