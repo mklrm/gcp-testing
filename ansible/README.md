@@ -45,3 +45,5 @@ fatal: [compute-instance-0-vm]: FAILED! => {"attempts": 5, "changed": true, "cmd
 PLAY RECAP ********************************************************************************************************************************************************************************************************compute-instance-0-vm      : ok=8    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
 ---
 
+**Which indeed was fixed by swapping over to a supported VM image**
+
