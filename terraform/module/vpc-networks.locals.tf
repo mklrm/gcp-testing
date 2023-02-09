@@ -2,7 +2,7 @@
 locals {
   compute_networks_0 = [
     for network in var.compute_networks : {
-      project                 = network.project
+      project                 = try(network.project, var.default_project)
       auto_create_subnetworks = network.auto_create_subnetworks
       add_iap_firewall_rule   = network.add_iap_firewall_rule
       name = coalesce(
@@ -26,8 +26,9 @@ locals {
           null
         )
       )
-      compute_network_peerings = coalesce(network.compute_network_peerings, [])
-      compute_subnetworks      = coalesce(network.compute_subnetworks, [])
+      compute_network_peerings = try(network.compute_network_peerings, [])
+      compute_subnetworks      = try(network.compute_subnetworks, [])
+      compute_router_nats      = try(network.compute_router_nats, [])
     }
   ]
   compute_networks_1 = [
@@ -38,9 +39,9 @@ locals {
       add_iap_firewall_rule   = network.add_iap_firewall_rule
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
-          project       = network.project
+          project       = try(network.project, var.default_project)
           ip_cidr_range = subnetwork.ip_cidr_range
-          region        = subnetwork.region
+          region        = try(subnetwork.region, var.default_region)
           name = coalesce(
             subnetwork.name,
             subnetwork.name_prefix_disable != null
@@ -51,6 +52,32 @@ locals {
             try("${network.name}-${var.compute_subnetwork_default_prefix}-${idx}", null)
           )
           secondary_ip_ranges = subnetwork.secondary_ip_ranges
+        }
+      ]
+      google_compute_routers = [
+        # TODO List compute_router_nats that do not have the router value set, 
+        #      select unique network-region combinations, 
+        #      as something like map(network = region), 
+        #      create Cloud NATs naming their keys network-region,
+        #      also set null .router on compute_router_nats to 
+        #      their respective network-region combinations
+        #      
+      ]
+      compute_router_nats = network.compute_router_nats == null ? [] : [
+        for idx, cloud_nat in network.compute_cloud_nats : {
+          project = try(cloud_nat.project, var.default_project)
+          router  = "" # TODO Add automatic router creation based on if cloud_nat router is set or not
+          region  = try(cloud_nat.region, var.default_region)
+          name = coalesce(
+            cloud_nat.name,
+            cloud_nat.name_prefix_disable != null
+            ? cloud_nat.name_prefix_disable == true
+            ? try("${network.name}-${idx}", null)
+            : try("${network.name}-${cloud_nat.name_prefix}-${idx}", null)
+            : try("${network.name}-${cloud_nat.name_prefix}-${idx}", null),
+            try("${network.name}-${var.compute_cloud_nat_default_prefix}-${idx}", null)
+          )
+          secondary_ip_ranges = cloud_nat.secondary_ip_ranges
         }
       ]
       compute_network_peerings = network.compute_network_peerings == null ? [] : [

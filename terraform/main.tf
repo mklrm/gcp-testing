@@ -17,7 +17,8 @@ provider "google" {
 module "dynamic_deployment" {
   source = "./module"
 
-  project = var.project
+  project         = var.project # TODO Phase out and remove
+  default_project = var.project
 
   compute_networks = [
     {
@@ -75,7 +76,7 @@ module "dynamic_deployment" {
 
       boot_disk = {
         initialize_params = {
-          image = "ubuntu-os-cloud/ubuntu-2210-kinetic-amd64-v20230125"
+          image = "ubuntu-os-cloud/ubuntu-2204-lts"
         }
       }
 
