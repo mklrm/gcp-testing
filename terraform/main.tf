@@ -40,6 +40,7 @@ module "dynamic_deployment" {
           name_prefix   = "snet"
           ip_cidr_range = "10.2.0.0/16"
           #region        = "us-central1"
+          instance_attach_tags = ["amazing-app-spoke"]
           secondary_ip_ranges = [
             {
               range_name_prefix = "x"
@@ -99,12 +100,13 @@ module "dynamic_deployment" {
         }
       }
 
-
       network_interface = [
         {
-          subnetwork = "amazing-app-spoke-network-snet-0"
+          #subnetwork = "amazing-app-spoke-network-snet-1"
         }
       ]
+
+      tags = ["amazing-app-spoke"]
     }
   ]
 }

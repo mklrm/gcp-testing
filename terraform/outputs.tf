@@ -13,3 +13,20 @@
 #output "compute_networks_1" {
 #  value = module.dynamic_deployment.compute_networks_1
 #}
+
+#output "test" {
+#  value = module.dynamic_deployment.test
+#}
+#
+#output "test2" {
+#  value = module.dynamic_deployment.test2
+#}
+#
+#output "test3" {
+#  value = module.dynamic_deployment.test3
+#}
+#
+#output "test4" {
+#  value = module.dynamic_deployment.test4
+#}
+

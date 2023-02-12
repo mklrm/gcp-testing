@@ -14,3 +14,19 @@ output "compute_networks_1" {
   value = local.compute_networks_1
 }
 
+#output "test" {
+#  value = local.test
+#}
+#
+#output "test2" {
+#  value = local.test2
+#}
+#
+#output "test3" {
+#  value = local.test3
+#}
+#
+#output "test4" {
+#  value = local.test4
+#}
+

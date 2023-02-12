@@ -49,11 +49,12 @@ variable "compute_networks" {
     auto_create_subnetworks = optional(bool)
     add_iap_firewall_rule   = optional(bool)
     compute_subnetworks = optional(list(object({
-      name                = optional(string)
-      name_prefix         = optional(string)
-      name_prefix_disable = optional(bool)
-      ip_cidr_range       = optional(string) # TODO Pull off of a list if user doesn't pass this
-      region              = optional(string)
+      name                 = optional(string)
+      name_prefix          = optional(string)
+      name_prefix_disable  = optional(bool)
+      ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
+      region               = optional(string)
+      instance_attach_tags = optional(list(string))
       secondary_ip_ranges = optional(list(object({
         range_name                = optional(string)
         range_name_prefix         = optional(string)

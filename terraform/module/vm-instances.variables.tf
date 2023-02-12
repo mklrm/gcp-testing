@@ -87,7 +87,8 @@ variable "compute_instances" {
       email  = optional(string)
       scopes = optional(list(string))
     }))
-    tags = optional(list(string))
+    tags              = optional(list(string))
+    add_allow_iap_tag = optional(bool)
     shielded_instance_config = optional(object({
       enable_secure_boot          = optional(bool)
       enable_vtpm                 = optional(bool)

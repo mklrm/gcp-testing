@@ -16,23 +16,31 @@ locals {
           subnetwork = network_interface.subnetwork != null ? network_interface.subnetwork : null,
         }
       ]
-      allow_stopping_for_update    = instance.allow_stopping_for_update
-      attached_disk                = instance.attached_disk
-      can_ip_forward               = instance.can_ip_forward
-      description                  = instance.description
-      desired_status               = instance.desired_status
-      deletion_protection          = instance.deletion_protection
-      hostname                     = instance.hostname
-      guest_accelerator            = instance.guest_accelerator
-      labels                       = instance.labels
-      metadata                     = instance.metadata
-      metadata_startup_script      = instance.metadata_startup_script
-      min_cpu_platform             = instance.min_cpu_platform
-      project                      = instance.project
-      scheduling                   = instance.scheduling
-      scratch_disk                 = instance.scratch_disk
-      service_account              = instance.service_account
-      tags                         = instance.tags
+      allow_stopping_for_update = instance.allow_stopping_for_update
+      attached_disk             = instance.attached_disk
+      can_ip_forward            = instance.can_ip_forward
+      description               = instance.description
+      desired_status            = instance.desired_status
+      deletion_protection       = instance.deletion_protection
+      hostname                  = instance.hostname
+      guest_accelerator         = instance.guest_accelerator
+      labels                    = instance.labels
+      metadata                  = instance.metadata
+      metadata_startup_script   = instance.metadata_startup_script
+      min_cpu_platform          = instance.min_cpu_platform
+      project                   = instance.project
+      scheduling                = instance.scheduling
+      scratch_disk              = instance.scratch_disk
+      service_account           = instance.service_account
+      tags                      = instance.tags
+      tags = concat(
+        instance.tags,
+        instance.add_allow_iap_tag != null
+        ? instance.add_allow_iap_tag == true
+        ? ["allow-iap"]
+        : []
+        : ["allow-iap"]
+      )
       shielded_instance_config     = instance.shielded_instance_config
       enable_display               = instance.enable_display
       resource_policies            = instance.resource_policies

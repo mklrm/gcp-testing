@@ -39,7 +39,18 @@ resource "google_compute_instance" "compute_instances" {
   dynamic "network_interface" {
     for_each = each.value.network_interface[*]
     content {
-      subnetwork = resource.google_compute_subnetwork.compute_subnetworks[network_interface.value.subnetwork].self_link
+      # If subnetwork was not explicitly provided, use network tags to 
+      # try and find a subnetwork to connect to
+      subnetwork = network_interface.value.subnetwork != null ? network_interface.value.subnetwork : resource.google_compute_subnetwork.compute_subnetworks[flatten(flatten([
+        # NOTE One would hope there's a better way of doing this
+        for tag in each.value.tags : {
+          subnetwork = [
+            for subnet in local.compute_subnetworks : {
+              subnet = contains(subnet.instance_attach_tags, tag) ? subnet.name : null
+            }
+          ]
+        }
+      ][*]["subnetwork"][*]["subnet"][*]))[0]].self_link
     }
   }
 
@@ -47,6 +58,5 @@ resource "google_compute_instance" "compute_instances" {
     user-data = data.cloudinit_config.conf.rendered
   }
 
-  # TODO Add add_allow_iap_tag boolean
-  tags = ["allow-iap"]
+  tags = each.value.tags
 }
