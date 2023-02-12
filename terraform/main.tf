@@ -55,6 +55,15 @@ module "dynamic_deployment" {
           region        = "us-central1"
         }
       ]
+      cloud_nats = [
+        {
+          name = "CLOUD NAT 1"
+        },
+        {
+          name = "CLOUD NAT 2"
+          #router = "asdasadasd"
+        },
+      ]
     },
     {
       name_prefix             = "amazing-app-hub"
@@ -63,6 +72,16 @@ module "dynamic_deployment" {
       project                 = var.project
       auto_create_subnetworks = false
       add_iap_firewall_rule   = false
+      cloud_nats = [
+        {
+          name = "CLOUD NAT 1"
+          #router = "asdaasdads"
+        },
+        {
+          name   = "CLOUD NAT 2"
+          router = "asdasadasd"
+        },
+      ]
     },
   ]
 
