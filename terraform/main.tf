@@ -39,7 +39,7 @@ module "dynamic_deployment" {
         {
           name_prefix   = "snet"
           ip_cidr_range = "10.2.0.0/16"
-          region        = "us-central1"
+          #region        = "us-central1"
           secondary_ip_ranges = [
             {
               range_name_prefix = "x"
@@ -57,12 +57,12 @@ module "dynamic_deployment" {
       ]
       cloud_nats = [
         {
-          name = "CLOUD NAT 1"
+          name = "cloud-nat-1"
         },
-        {
-          name = "CLOUD NAT 2"
-          #router = "asdasadasd"
-        },
+        #{
+        #  name = "cloud-nat-2"
+        #  #router = "asdasadasd"
+        #},
       ]
     },
     {
@@ -74,13 +74,13 @@ module "dynamic_deployment" {
       add_iap_firewall_rule   = false
       cloud_nats = [
         {
-          name = "CLOUD NAT 1"
+          name = "cloud-nat-3"
           #router = "asdaasdads"
         },
-        {
-          name   = "CLOUD NAT 2"
-          router = "asdasadasd"
-        },
+        #{
+        #  name = "cloud-nat-4"
+        #  #router = "asdasadasd"
+        #},
       ]
     },
   ]

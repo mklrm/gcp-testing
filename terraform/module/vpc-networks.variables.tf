@@ -25,6 +25,12 @@ variable "compute_subnetwork_secondary_range_default_postfix" {
   type        = string
 }
 
+variable "cloud_nat_default_prefix" {
+  default     = "cloud-nat"
+  description = "Default prefix for Cloud NAT names"
+  type        = string
+}
+
 variable "compute_networks" {
   default     = []
   description = "Compute networks and networking connected resources"
@@ -72,10 +78,7 @@ variable "compute_networks" {
       import_subnet_routes_with_public_ip = optional(bool)
     })))
     cloud_nats = optional(list(object({
-      # TODO Automatically create cloud router by default, 
-      # keeping in mind that if there already is one in the 
-      # network/region you can use that but not create 
-      # another one
+      # TODO Test name generation
       name                               = optional(string)
       name_prefix                        = optional(string)
       name_prefix_disable                = optional(bool)
