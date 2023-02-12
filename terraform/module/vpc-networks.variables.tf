@@ -7,9 +7,9 @@ variable "compute_network_default_postfix" {
   type        = string
 }
 
-variable "compute_subnetwork_default_prefix" {
+variable "compute_subnetwork_default_postfix" {
   default     = "snet"
-  description = "Default prefix for subnetwork names"
+  description = "Default postfix for subnetwork names"
   type        = string
 }
 
@@ -25,7 +25,7 @@ variable "compute_subnetwork_secondary_range_default_postfix" {
   type        = string
 }
 
-variable "cloud_nat_default_prefix" {
+variable "cloud_nat_default_postfix" {
   default     = "cloud-nat"
   description = "Default prefix for Cloud NAT names"
   type        = string
@@ -50,16 +50,17 @@ variable "compute_networks" {
     add_iap_firewall_rule   = optional(bool)
     compute_subnetworks = optional(list(object({
       name                 = optional(string)
-      name_prefix          = optional(string)
-      name_prefix_disable  = optional(bool)
+      name_postfix         = optional(string)
+      name_postfix_disable = optional(bool)
       ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
       region               = optional(string)
       instance_attach_tags = optional(list(string))
+      add_allow_iap_tag    = optional(bool)
       secondary_ip_ranges = optional(list(object({
-        range_name                = optional(string)
-        range_name_prefix         = optional(string)
-        range_name_prefix_disable = optional(bool)
-        ip_cidr_range             = optional(string) # TODO Pull off of a list if user doesn't pass this
+        range_name                 = optional(string)
+        range_name_postfix         = optional(string)
+        range_name_postfix_disable = optional(bool)
+        ip_cidr_range              = optional(string) # TODO Pull off of a list if user doesn't pass this
       })))
     })))
     compute_network_peerings = optional(list(object({
@@ -81,8 +82,8 @@ variable "compute_networks" {
     cloud_nats = optional(list(object({
       # TODO Test name generation
       name                               = optional(string)
-      name_prefix                        = optional(string)
-      name_prefix_disable                = optional(bool)
+      name_postfix                       = optional(string)
+      name_postfix_disable               = optional(bool)
       project                            = optional(string)
       router                             = optional(string)
       region                             = optional(string)

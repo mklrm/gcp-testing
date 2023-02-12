@@ -32,12 +32,12 @@ locals {
 
       cloud_nats = network.cloud_nats == null ? [] : [
         for cloud_nat in network.cloud_nats : {
-          name                = cloud_nat.name
-          name_prefix         = cloud_nat.name_prefix
-          name_prefix_disable = cloud_nat.name_prefix_disable
-          region              = cloud_nat.region != null ? cloud_nat.region : var.default_region
-          project             = cloud_nat.project != null ? cloud_nat.project : var.default_project
-          router              = cloud_nat.router
+          name                 = cloud_nat.name
+          name_postfix         = cloud_nat.name_postfix
+          name_postfix_disable = cloud_nat.name_postfix_disable
+          region               = cloud_nat.region != null ? cloud_nat.region : var.default_region
+          project              = cloud_nat.project != null ? cloud_nat.project : var.default_project
+          router               = cloud_nat.router
         }
       ]
     }
@@ -62,12 +62,12 @@ locals {
           )
           name = coalesce(
             subnetwork.name,
-            subnetwork.name_prefix_disable != null
-            ? subnetwork.name_prefix_disable == true
+            subnetwork.name_postfix_disable != null
+            ? subnetwork.name_postfix_disable == true
             ? try("${network.name}-${idx}", null)
-            : try("${network.name}-${subnetwork.name_prefix}-${idx}", null)
-            : try("${network.name}-${subnetwork.name_prefix}-${idx}", null),
-            try("${network.name}-${var.compute_subnetwork_default_prefix}-${idx}", null)
+            : try("${network.name}-${subnetwork.name_postfix}-${idx}", null)
+            : try("${network.name}-${subnetwork.name_postfix}-${idx}", null),
+            try("${network.name}-${var.compute_subnetwork_default_postfix}-${idx}", null)
           )
           secondary_ip_ranges = subnetwork.secondary_ip_ranges
         }
@@ -92,12 +92,12 @@ locals {
           region = cloud_nat.region
           name = coalesce(
             cloud_nat.name,
-            cloud_nat.name_prefix_disable != null
-            ? cloud_nat.name_prefix_disable == true
+            cloud_nat.name_postfix_disable != null
+            ? cloud_nat.name_postfix_disable == true
             ? try("${network.name}-${idx}", null)
-            : try("${network.name}-${cloud_nat.name_prefix}-${idx}", null)
-            : try("${network.name}-${cloud_nat.name_prefix}-${idx}", null),
-            try("${network.name}-${var.cloud_nat_default_prefix}-${idx}", null)
+            : try("${network.name}-${cloud_nat.name_postfix}-${idx}", null)
+            : try("${network.name}-${cloud_nat.name_postfix}-${idx}", null),
+            try("${network.name}-${var.cloud_nat_default_postfix}-${idx}", null)
           )
         }
       ]
@@ -214,11 +214,11 @@ locals {
             for idx, secondary_range in subnetwork.secondary_ip_ranges : {
               name = coalesce(
                 secondary_range.range_name,
-                secondary_range.range_name_prefix_disable != null
-                ? secondary_range.range_name_prefix_disable == true
+                secondary_range.range_name_postfix_disable != null
+                ? secondary_range.range_name_postfix_disable == true
                 ? try("${subnetwork.name}-${idx}", null)
-                : try("${subnetwork.name}-${secondary_range.range_name_prefix}-${idx}", null)
-                : try("${subnetwork.name}-${secondary_range.range_name_prefix}-${idx}", null),
+                : try("${subnetwork.name}-${secondary_range.range_name_postfix}-${idx}", null)
+                : try("${subnetwork.name}-${secondary_range.range_name_postfix}-${idx}", null),
                 try("${subnetwork.name}-${var.compute_subnetwork_secondary_range_default_postfix}-${idx}", null)
               )
               ip_cidr_range = secondary_range.ip_cidr_range
