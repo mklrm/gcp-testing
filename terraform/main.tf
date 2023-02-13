@@ -37,14 +37,16 @@ module "dynamic_deployment" {
       ]
       compute_subnetworks = [
         {
-          name_postfix  = "snet"
-          ip_cidr_range = "10.2.0.0/16"
+          name_postfix     = "snet"
+          name_idx_disable = true
+          ip_cidr_range    = "10.2.0.0/16"
           #region        = "us-central1"
           instance_attach_tags = ["amazing-app-spoke"]
           secondary_ip_ranges = [
             {
-              range_name_postfix = "x"
-              ip_cidr_range      = "192.168.10.0/24"
+              range_name_postfix     = "x"
+              range_name_idx_disable = true
+              ip_cidr_range          = "192.168.10.0/24"
             },
             {
               ip_cidr_range = "192.168.11.0/24"
@@ -63,7 +65,9 @@ module "dynamic_deployment" {
           # works:
           name_postfix = "carrot"
           # works:
-          name_postfix_disable = true
+          #name_postfix_disable = true
+          # works:
+          name_idx_disable = true
         },
         #{
         #  name = "cloud-nat-2"

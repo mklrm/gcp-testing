@@ -2,7 +2,8 @@
 - You can add one or more instance_attach_tags on a subnetwork and add one of those tags to a virtual machine instance's network tags and the instance will attach to that subnetwork
 
 # TODO
-- [ ] Subnetworks, secondary ranges and Cloud NATs now alway get a postfixed idx number, should be able to disable that
+- [ ] Retest name generation
+- [x] Subnetworks, secondary ranges and Cloud NATs now alway get a postfixed idx number, should be able to disable that
 
 
 # Name generation design

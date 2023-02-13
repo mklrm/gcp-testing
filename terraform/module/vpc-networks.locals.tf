@@ -27,14 +27,42 @@ locals {
         )
       )
 
+      # TODO Set unset booleans to a default value here, use that to simplify later code:
       compute_network_peerings = try(network.compute_network_peerings, [])
-      compute_subnetworks      = try(network.compute_subnetworks, [])
+
+      compute_subnetworks = network.compute_subnetworks == null ? [] : [
+        for subnetwork in network.compute_subnetworks : {
+          name                 = subnetwork.name
+          name_postfix         = subnetwork.name_postfix
+          name_postfix_disable = subnetwork.name_postfix_disable != null ? subnetwork.name_postfix_disable : false
+          name_idx_disable     = subnetwork.name_idx_disable != null ? subnetwork.name_idx_disable : false
+          project              = network.project != null ? network.project : var.default_project
+          region               = subnetwork.region != null ? subnetwork.region : var.default_region
+          ip_cidr_range        = subnetwork.ip_cidr_range
+          instance_attach_tags = (
+            subnetwork.instance_attach_tags == null
+            ? []
+            : subnetwork.instance_attach_tags
+          )
+          #secondary_ip_ranges = subnetwork.secondary_ip_ranges
+          secondary_ip_ranges = subnetwork.secondary_ip_ranges == null ? [] : [
+            for secondary_range in subnetwork.secondary_ip_ranges : {
+              range_name                 = secondary_range.range_name
+              range_name_postfix         = secondary_range.range_name_postfix
+              range_name_postfix_disable = secondary_range.range_name_postfix_disable != null ? secondary_range.range_name_postfix_disable : false
+              range_name_idx_disable     = secondary_range.range_name_idx_disable != null ? secondary_range.range_name_idx_disable : false
+              ip_cidr_range              = secondary_range.ip_cidr_range
+            }
+          ]
+        }
+      ]
 
       cloud_nats = network.cloud_nats == null ? [] : [
         for cloud_nat in network.cloud_nats : {
           name                 = cloud_nat.name
           name_postfix         = cloud_nat.name_postfix
-          name_postfix_disable = cloud_nat.name_postfix_disable
+          name_postfix_disable = cloud_nat.name_postfix_disable != null ? cloud_nat.name_postfix_disable : false
+          name_idx_disable     = cloud_nat.name_idx_disable != null ? cloud_nat.name_idx_disable : false
           region               = cloud_nat.region != null ? cloud_nat.region : var.default_region
           project              = cloud_nat.project != null ? cloud_nat.project : var.default_project
           router               = cloud_nat.router
@@ -52,23 +80,19 @@ locals {
 
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
-          project       = network.project != null ? network.project : var.default_project
-          region        = subnetwork.region != null ? subnetwork.region : var.default_region
-          ip_cidr_range = subnetwork.ip_cidr_range
-          instance_attach_tags = (
-            subnetwork.instance_attach_tags == null
-            ? []
-            : subnetwork.instance_attach_tags
-          )
+          project              = subnetwork.project
+          region               = subnetwork.region
+          ip_cidr_range        = subnetwork.ip_cidr_range
+          instance_attach_tags = subnetwork.instance_attach_tags
           name = coalesce(
             subnetwork.name,
-            subnetwork.name_postfix_disable != null
-            ? subnetwork.name_postfix_disable == true
-            ? try("${network.name}-${idx}", null)
-            : try("${network.name}-${subnetwork.name_postfix}-${idx}", null)
-            : try("${network.name}-${subnetwork.name_postfix}-${idx}", null),
-            try("${network.name}-${var.compute_subnetwork_default_postfix}-${idx}", null)
+            subnetwork.name_postfix_disable == true
+            ? try("${network.name}", null)
+            : try("${network.name}-${subnetwork.name_postfix}", null),
+            try("${network.name}-${var.compute_subnetwork_default_postfix}", null)
           )
+          name_explicitly_set = subnetwork.name != null ? true : false
+          name_idx_disable    = subnetwork.name_idx_disable
           secondary_ip_ranges = subnetwork.secondary_ip_ranges
         }
       ]
@@ -92,13 +116,13 @@ locals {
           region = cloud_nat.region
           name = coalesce(
             cloud_nat.name,
-            cloud_nat.name_postfix_disable != null
-            ? cloud_nat.name_postfix_disable == true
-            ? try("${network.name}-${idx}", null)
-            : try("${network.name}-${cloud_nat.name_postfix}-${idx}", null)
-            : try("${network.name}-${cloud_nat.name_postfix}-${idx}", null),
-            try("${network.name}-${var.cloud_nat_default_postfix}-${idx}", null)
+            cloud_nat.name_postfix_disable == true
+            ? try("${network.name}", null)
+            : try("${network.name}-${cloud_nat.name_postfix}", null),
+            try("${network.name}-${var.cloud_nat_default_postfix}", null)
           )
+          name_explicitly_set = cloud_nat.name != null ? true : false
+          name_idx_disable    = cloud_nat.name_idx_disable
         }
       ]
 
@@ -196,7 +220,7 @@ locals {
     }
   ]
 
-  compute_networks = [
+  compute_networks_2 = [
     for network in local.compute_networks_1 : {
       name                    = network.name
       project                 = network.project
@@ -205,23 +229,29 @@ locals {
 
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
-          name                 = subnetwork.name
+          name = (
+            subnetwork.name_explicitly_set == true
+            ? subnetwork.name
+            : subnetwork.name_idx_disable == true
+            ? subnetwork.name
+            : "${subnetwork.name}-${idx}"
+          )
           project              = network.project
           ip_cidr_range        = subnetwork.ip_cidr_range
           region               = subnetwork.region
           instance_attach_tags = subnetwork.instance_attach_tags
-          compute_subnetwork_secondary_ranges = subnetwork.secondary_ip_ranges == null ? [] : [
+          secondary_ip_ranges = subnetwork.secondary_ip_ranges == null ? [] : [
             for idx, secondary_range in subnetwork.secondary_ip_ranges : {
-              name = coalesce(
+              range_name = coalesce(
                 secondary_range.range_name,
-                secondary_range.range_name_postfix_disable != null
-                ? secondary_range.range_name_postfix_disable == true
-                ? try("${subnetwork.name}-${idx}", null)
-                : try("${subnetwork.name}-${secondary_range.range_name_postfix}-${idx}", null)
-                : try("${subnetwork.name}-${secondary_range.range_name_postfix}-${idx}", null),
-                try("${subnetwork.name}-${var.compute_subnetwork_secondary_range_default_postfix}-${idx}", null)
+                secondary_range.range_name_postfix_disable == true
+                ? try("${subnetwork.name}", null)
+                : try("${subnetwork.name}-${secondary_range.range_name_postfix}", null),
+                try("${subnetwork.name}-${var.compute_subnetwork_secondary_range_default_postfix}", null)
               )
-              ip_cidr_range = secondary_range.ip_cidr_range
+              name_explicitly_set    = secondary_range.range_name != null ? true : false
+              range_name_idx_disable = secondary_range.range_name_idx_disable
+              ip_cidr_range          = secondary_range.ip_cidr_range
             }
           ]
         }
@@ -253,7 +283,20 @@ locals {
         }
       ]
 
-      cloud_nats = network.cloud_nats
+      cloud_nats = [
+        for idx, cloud_nat in network.cloud_nats : {
+          project = cloud_nat.project
+          router  = cloud_nat.router
+          region  = cloud_nat.region
+          name = (
+            cloud_nat.name_explicitly_set == true
+            ? cloud_nat.name
+            : cloud_nat.name_idx_disable == true
+            ? cloud_nat.name
+            : "${cloud_nat.name}-${idx}"
+          )
+        }
+      ]
 
       autogenerated_compute_routers = [
         for idx, router in network.autogenerated_compute_routers : {
@@ -267,6 +310,42 @@ locals {
     }
   ]
 
+  compute_networks = [
+    for network in local.compute_networks_2 : {
+      name                    = network.name
+      project                 = network.project
+      auto_create_subnetworks = network.auto_create_subnetworks
+      add_iap_firewall_rule   = network.add_iap_firewall_rule
+
+      compute_subnetworks = network.compute_subnetworks == null ? [] : [
+        for idx, subnetwork in network.compute_subnetworks : {
+          name                 = subnetwork.name
+          project              = subnetwork.project
+          ip_cidr_range        = subnetwork.ip_cidr_range
+          region               = subnetwork.region
+          instance_attach_tags = subnetwork.instance_attach_tags
+          #compute_subnetwork_secondary_ranges = subnetwork.secondary_ip_ranges == null ? [] : [
+          secondary_ip_ranges = subnetwork.secondary_ip_ranges == null ? [] : [
+            for idx, secondary_range in subnetwork.secondary_ip_ranges : {
+              range_name = (
+                secondary_range.name_explicitly_set == true
+                ? secondary_range.range_name
+                : secondary_range.range_name_idx_disable == true
+                ? secondary_range.range_name
+                : "${secondary_range.range_name}-${idx}"
+              )
+              ip_cidr_range = secondary_range.ip_cidr_range
+            }
+          ]
+        }
+      ]
+
+      compute_network_peerings      = network.compute_network_peerings
+      cloud_nats                    = network.cloud_nats
+      autogenerated_compute_routers = network.autogenerated_compute_routers
+    }
+  ]
+
   compute_subnetworks = flatten([
     for network in local.compute_networks : [
       for subnetwork in network.compute_subnetworks : {
@@ -276,7 +355,9 @@ locals {
         ip_cidr_range        = subnetwork.ip_cidr_range
         region               = subnetwork.region
         instance_attach_tags = subnetwork.instance_attach_tags
-        secondary_ip_ranges  = coalesce(subnetwork.compute_subnetwork_secondary_ranges, [])
+        #secondary_ip_ranges  = coalesce(subnetwork.compute_subnetwork_secondary_ranges, [])
+        # TODO Prtty sure the coalsece() is not needed here at this point
+        secondary_ip_ranges = coalesce(subnetwork.secondary_ip_ranges, [])
       }
     ]
   ])

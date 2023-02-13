@@ -52,6 +52,7 @@ variable "compute_networks" {
       name                 = optional(string)
       name_postfix         = optional(string)
       name_postfix_disable = optional(bool)
+      name_idx_disable     = optional(bool)
       ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
       region               = optional(string)
       instance_attach_tags = optional(list(string))
@@ -60,6 +61,7 @@ variable "compute_networks" {
         range_name                 = optional(string)
         range_name_postfix         = optional(string)
         range_name_postfix_disable = optional(bool)
+        range_name_idx_disable     = optional(bool)
         ip_cidr_range              = optional(string) # TODO Pull off of a list if user doesn't pass this
       })))
     })))
@@ -80,10 +82,10 @@ variable "compute_networks" {
       import_subnet_routes_with_public_ip = optional(bool)
     })))
     cloud_nats = optional(list(object({
-      # TODO Test name generation
       name                               = optional(string)
       name_postfix                       = optional(string)
       name_postfix_disable               = optional(bool)
+      name_idx_disable                   = optional(bool)
       project                            = optional(string)
       router                             = optional(string)
       region                             = optional(string)
