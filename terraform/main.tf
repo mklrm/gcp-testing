@@ -98,4 +98,18 @@ module "dynamic_deployment" {
       tags = ["amazing-app-spoke"]
     }
   ]
+
+  container_clusters = [
+    {
+      name = "beowulf"
+      container_node_pools = [
+        {
+          name = "chicklet"
+          #node_config = {
+          #  preemptible = true
+          #}
+        }
+      ]
+    }
+  ]
 }
