@@ -1,8 +1,3 @@
-variable "project" {
-  description = "Project to deploy to"
-  type        = string
-}
-
 variable "default_project" {
   description = "Default project for resources"
   type        = string

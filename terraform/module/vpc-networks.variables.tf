@@ -48,11 +48,13 @@ variable "compute_networks" {
     project                 = optional(string)
     auto_create_subnetworks = optional(bool)
     add_iap_firewall_rule   = optional(bool)
+    tags                    = optional(list(string))
     compute_subnetworks = optional(list(object({
       name                 = optional(string)
       name_postfix         = optional(string)
       name_postfix_disable = optional(bool)
       name_idx_disable     = optional(bool)
+      project              = optional(string)
       ip_cidr_range        = optional(string) # TODO Pull off of a list if user doesn't pass this
       region               = optional(string)
       instance_attach_tags = optional(list(string))
@@ -76,6 +78,7 @@ variable "compute_networks" {
       peer_network_name_prefix            = optional(string)
       peer_network_name_postfix           = optional(string)
       peer_network_name_postfix_disable   = optional(bool)
+      peer_network_tags                   = optional(list(string))
       export_custom_routes                = optional(bool)
       import_custom_routes                = optional(bool)
       export_subnet_routes_with_public_ip = optional(bool)

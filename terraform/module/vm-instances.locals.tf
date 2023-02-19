@@ -28,7 +28,7 @@ locals {
       metadata                  = instance.metadata
       metadata_startup_script   = instance.metadata_startup_script
       min_cpu_platform          = instance.min_cpu_platform
-      project                   = instance.project
+      project                   = instance.project != null ? instance.project : var.default_project
       scheduling                = instance.scheduling
       scratch_disk              = instance.scratch_disk
       service_account           = instance.service_account

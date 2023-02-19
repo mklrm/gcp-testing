@@ -1,8 +1,11 @@
 # Features
-- You can add one or more instance_attach_tags on a subnetwork and add one of those tags to a virtual machine instance's network tags and the instance will attach to that subnetwork
+- Add one or more instance_attach_tags on a subnetwork and add one of those tags to a virtual machine instance's network tags and the instance will attach to that subnetwork
+- Add a value to .peer_network_tags in a peering to peer to a network that includes the same value in it's .tags
 
 # TODO
+- [ ] Adding multiple peer_network_tags doesn't do anything very useful right now, make it so a peering will be generated for each tag so you can use the tags as a shortcut for generating peerings to multiple networks
 - [ ] Retest name generation
+- [x] Perhaps explore tagging as an option for peering networks
 - [x] Subnetworks, secondary ranges and Cloud NATs now alway get a postfixed idx number, should be able to disable that
 
 
