@@ -38,9 +38,6 @@ variable "compute_networks" {
     # TODO Add a name_prefix_disable_propagate boolean that applies the setting to sub objects
     # TODO Add a boolean to determine if a random string will be baked into names
     # TODO Test name generation thoroughly
-    # TODO Might want to add a boolean for adding a number to network names, 
-    # will have to take matching prefixes into account (same prefixes would usually 
-    # likely be part of the same sequence)
     name                    = optional(string)
     name_prefix             = optional(string)
     name_postfix            = optional(string)

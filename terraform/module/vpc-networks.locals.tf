@@ -1,6 +1,6 @@
 locals {
   compute_networks_0 = [
-    # TODO Set unset booleans to a default value here, use that to simplify later code:
+    # TODO Set unset booleans to a default value here, use that to simplify later code
     for network in var.compute_networks : {
       project                 = try(network.project, var.default_project)
       auto_create_subnetworks = network.auto_create_subnetworks
