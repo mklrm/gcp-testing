@@ -1,5 +1,6 @@
 locals {
   compute_networks_0 = [
+    # TODO Set unset booleans to a default value here, use that to simplify later code:
     for network in var.compute_networks : {
       project                 = try(network.project, var.default_project)
       auto_create_subnetworks = network.auto_create_subnetworks
@@ -19,8 +20,7 @@ locals {
         )
       )
 
-      # TODO Set unset booleans to a default value here, use that to simplify later code:
-      compute_network_peerings = try(network.compute_network_peerings, [])
+      compute_network_peerings = network.compute_network_peerings != null ? network.compute_network_peerings : []
 
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for subnetwork in network.compute_subnetworks : {
@@ -127,142 +127,38 @@ locals {
 
       compute_network_peerings = network.compute_network_peerings == null ? [] : [
         for idx, peering in network.compute_network_peerings : {
+          name                 = peering.name
+          name_prefix          = peering.name_prefix
+          name_prefix_disable  = peering.name_prefix_disable
+          name_postfix         = peering.name_postfix
+          name_postfix_disable = peering.name_postfix_disable
+          name_idx_enable      = peering.name_idx_enable
+
+          peer_network_name = (
+            peering.peer_network_name != null
+            ? peering.peer_network_name
+            : peering.peer_network_tags != null
+            ? flatten(flatten([
+              # NOTE One would hope there's a better way of doing this
+              for tag in peering.peer_network_tags : {
+                network = [
+                  for net in local.compute_networks_0 : {
+                    net = contains(net.tags, tag) ? net.name : null
+                  } if net.name != network.name
+                ]
+              }
+            ][*]["network"][*]["net"][*]))[0]
+            : null
+          )
+
+          peer_network_name_prefix            = peering.peer_network_name_prefix
+          peer_network_name_postfix           = peering.peer_network_name_postfix
+          peer_network_name_postfix_disable   = peering.peer_network_name_postfix_disable
+          peer_network_tags                   = peering.peer_network_tags
           export_custom_routes                = peering.export_custom_routes
           import_custom_routes                = peering.import_custom_routes
           export_subnet_routes_with_public_ip = peering.export_subnet_routes_with_public_ip
           import_subnet_routes_with_public_ip = peering.import_subnet_routes_with_public_ip
-          name                                = peering.name
-          name_prefix_disable                 = peering.name_prefix_disable
-          name_postfix_disable                = peering.name_postfix_disable
-          name_idx_enable                     = peering.name_idx_enable
-          # TODO It would simplify lots of things if I was able to get around 
-          # having to check if a variable is null before checking what the 
-          # value is like I do here:
-          name_prefix = (peering.peer_network_tags != null
-            # GENERATE name_prefix WHEN peer_network_tags IS SET
-            ? (
-              peering.name_prefix_disable != null
-              ? peering.name_prefix_disable == true
-              ? ""
-              : coalesce(
-                try("${peering.name_prefix}", null),
-                try("${network.name}-to-${
-                  coalesce(
-                    "test",
-                    peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
-                    # TODO Merge these two tries by inlining one in the other:
-                    try(
-                      "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
-                      null
-                    ),
-                    try(
-                      "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
-                      null
-                    )
-                  )
-                }", null),
-              )
-              : coalesce(
-                try("${peering.name_prefix}", null),
-                try("${network.name}-to-${
-                  coalesce(
-                    "test",
-                    peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
-                    # TODO Merge these two tries by inlining one in the other:
-                    try(
-                      "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
-                      null
-                    ),
-                    try(
-                      "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
-                      null
-                    )
-                  )
-                }", null),
-              )
-            )
-            # //GENERATE name_prefix WHEN peer_network_tags IS SET
-
-            # GENERATE name_prefix WHEN peer_network_tags IS NOT SET
-            : (
-              peering.name_prefix_disable != null
-              ? peering.name_prefix_disable == true
-              ? ""
-              : coalesce(
-                try("${peering.name_prefix}", null),
-                try("${network.name}-to-${
-                  coalesce(
-                    peering.peer_network_name,
-                    peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
-                    # TODO Merge these two tries by inlining one in the other:
-                    try(
-                      "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
-                      null
-                    ),
-                    try(
-                      "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
-                      null
-                    )
-                  )
-                }", null),
-              )
-              : coalesce(
-                try("${peering.name_prefix}", null),
-                try("${network.name}-to-${
-                  coalesce(
-                    peering.peer_network_name,
-                    peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
-                    # TODO Merge these two tries by inlining one in the other:
-                    try(
-                      "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
-                      null
-                    ),
-                    try(
-                      "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
-                      null
-                    )
-                  )
-                }", null),
-              )
-            )
-          )
-
-          name_postfix = "${
-            peering.name_postfix_disable != null
-            ? peering.name_postfix_disable == false
-            ? peering.name_postfix != null
-            ? "-${peering.name_postfix}"
-            : "-${var.compute_network_peering_default_postfix}"
-            # peering.name_postfix_disable == true:
-            : ""
-            # peering.name_postfix_disable == null:
-            : peering.name_postfix != null
-            ? "-${peering.name_postfix}"
-            : "-${var.compute_network_peering_default_postfix}"
-            }${
-            peering.name_idx_enable != null
-            ? peering.name_idx_enable == true
-            ? "-${idx}"
-            : ""
-            # peering.name_idx_enable == false:
-            : ""
-          }"
-
-          peer_network_tags = peering.peer_network_tags
-
-          peer_network_name = peering.peer_network_tags != null ? "" : coalesce(
-            peering.peer_network_name,
-            peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
-            # TODO Merge these two tries by inlining one in the other:
-            try(
-              "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
-              null
-            ),
-            try(
-              "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
-              null
-            )
-          )
         }
       ]
     }
@@ -312,24 +208,97 @@ locals {
           import_custom_routes                = peering.import_custom_routes
           export_subnet_routes_with_public_ip = peering.export_subnet_routes_with_public_ip
           import_subnet_routes_with_public_ip = peering.import_subnet_routes_with_public_ip
-          name = coalesce(
-            peering.name,
-            # If prefix and postfix are disabled and idx_enable isn't set, return idx:
+          name                                = peering.name
+          name_prefix_disable                 = peering.name_prefix_disable
+          name_postfix_disable                = peering.name_postfix_disable
+          name_idx_enable                     = peering.name_idx_enable
+          # TODO It would simplify lots of things if I was able to get around 
+          # having to check if a variable is null before checking what the 
+          # value is like I do here:
+          name_prefix = (
             peering.name_prefix_disable != null
             ? peering.name_prefix_disable == true
-            ? peering.name_postfix_disable != null
-            ? peering.name_postfix_disable == true
-            ? peering.name_idx_enable == null
-            ? "${idx}"
-            : null
-            : null
-            : null
-            : null
-            : null,
-            "${peering.name_prefix}${peering.name_postfix}"
+            ? ""
+            : coalesce(
+              try("${peering.name_prefix}", null),
+              try("${network.name}-to-${
+                coalesce(
+                  peering.peer_network_name,
+                  peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
+                  # TODO Merge these two tries by inlining one in the other:
+                  try(
+                    "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
+                    null
+                  ),
+                  try(
+                    "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
+                    null
+                  )
+                )
+              }", null),
+            )
+            : coalesce(
+              try("${peering.name_prefix}", null),
+              try("${network.name}-to-${
+                coalesce(
+                  peering.peer_network_name,
+                  peering.peer_network_name_postfix_disable != null ? peering.peer_network_name_postfix_disable == true ? peering.peer_network_name_prefix : null : null,
+                  # TODO Merge these two tries by inlining one in the other:
+                  try(
+                    "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
+                    null
+                  ),
+                  try(
+                    "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
+                    null
+                  )
+                )
+              }", null),
+            )
           )
+
+          name_postfix = "${
+            peering.name_postfix_disable != null
+            ? peering.name_postfix_disable == false
+            ? peering.name_postfix != null
+            ? "-${peering.name_postfix}"
+            : "-${var.compute_network_peering_default_postfix}"
+            # peering.name_postfix_disable == true:
+            : ""
+            # peering.name_postfix_disable == null:
+            : peering.name_postfix != null
+            ? "-${peering.name_postfix}"
+            : "-${var.compute_network_peering_default_postfix}"
+            }${
+            peering.name_idx_enable != null
+            ? peering.name_idx_enable == true
+            ? "-${idx}"
+            : ""
+            # peering.name_idx_enable == false:
+            : ""
+          }"
+
           peer_network_tags = peering.peer_network_tags
-          peer_network_name = peering.peer_network_name
+
+          peer_network_name = coalesce(
+            peering.peer_network_name,
+            (
+              peering.peer_network_name_postfix_disable != null
+              ? peering.peer_network_name_postfix_disable == true
+              ? peering.peer_network_name_prefix
+              : null
+              : null
+            ),
+            # TODO Merge these two tries by inlining one in the other:
+            try(
+              "${peering.peer_network_name_prefix}-${peering.peer_network_name_postfix}",
+              null
+            ),
+            try(
+              "${peering.peer_network_name_prefix}-${var.compute_network_default_postfix}",
+              null
+            )
+          )
         }
       ]
 
@@ -360,8 +329,50 @@ locals {
     }
   ]
 
-  compute_networks = [
+  compute_networks_3 = [
     for network in local.compute_networks_2 : {
+      name                    = network.name
+      project                 = network.project
+      auto_create_subnetworks = network.auto_create_subnetworks
+      add_iap_firewall_rule   = network.add_iap_firewall_rule
+      tags                    = network.tags
+      compute_subnetworks     = network.compute_subnetworks
+
+      compute_network_peerings = network.compute_network_peerings == null ? [] : [
+        for idx, peering in network.compute_network_peerings : {
+          export_custom_routes                = peering.export_custom_routes
+          import_custom_routes                = peering.import_custom_routes
+          export_subnet_routes_with_public_ip = peering.export_subnet_routes_with_public_ip
+          import_subnet_routes_with_public_ip = peering.import_subnet_routes_with_public_ip
+
+          name = coalesce(
+            peering.name,
+            # If prefix and postfix are disabled and idx_enable isn't set, return idx:
+            peering.name_prefix_disable != null
+            ? peering.name_prefix_disable == true
+            ? peering.name_postfix_disable != null
+            ? peering.name_postfix_disable == true
+            ? peering.name_idx_enable == null
+            ? "${idx}"
+            : null
+            : null
+            : null
+            : null
+            : null,
+            "${peering.name_prefix}${peering.name_postfix}"
+          )
+          peer_network_tags = peering.peer_network_tags
+          peer_network_name = peering.peer_network_name
+        }
+      ]
+
+      cloud_nats                    = network.cloud_nats
+      autogenerated_compute_routers = network.autogenerated_compute_routers
+    }
+  ]
+
+  compute_networks = [
+    for network in local.compute_networks_3 : {
       name                    = network.name
       project                 = network.project
       auto_create_subnetworks = network.auto_create_subnetworks

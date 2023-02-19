@@ -22,25 +22,10 @@ resource "google_compute_subnetwork" "compute_subnetworks" {
 }
 
 resource "google_compute_network_peering" "compute_network_peerings" {
-  for_each = { for peering in local.compute_network_peerings : peering.name => peering }
-  name     = each.value.name
-  network  = google_compute_network.compute_networks[each.value.network_name].self_link
-  #peer_network                        = google_compute_network.compute_networks[each.value.peer_network_name].self_link
-
-  peer_network = (
-    each.value.peer_network_tags == null
-    ? google_compute_network.compute_networks[each.value.peer_network_name].self_link
-    : resource.google_compute_network.compute_networks[flatten(flatten([
-      # NOTE One would hope there's a better way of doing this
-      for tag in each.value.peer_network_tags : {
-        network = [
-          for net in local.compute_networks : {
-            net = contains(net.tags, tag) ? net.name : null
-          } if net.name != each.value.network_name
-        ]
-      }
-    ][*]["network"][*]["net"][*]))[0]].self_link
-  )
+  for_each     = { for peering in local.compute_network_peerings : peering.name => peering }
+  name         = each.value.name
+  network      = google_compute_network.compute_networks[each.value.network_name].self_link
+  peer_network = google_compute_network.compute_networks[each.value.peer_network_name].self_link
 
   export_custom_routes                = each.value.export_custom_routes
   import_custom_routes                = each.value.import_custom_routes
