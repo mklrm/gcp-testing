@@ -4,6 +4,13 @@
 - Adding a Cloud NAT without specifying a Cloud Router will automatically generate a router
 
 # TODO
+- [ ] google_project_service.gke is not correctly configured to pick up the project id
+- [ ] Automatically enable APIs
+- [ ] Add local.network_cidr_ranges and use them in creation of the allow-internal rules
+- [ ] Add a default to the allow internal rule (enabled)
+- [ ] Remove the need for the empty network interface block on a VM
+- [ ] Autocreating a Cloud NAT should be a boolean option you turn on instead off adding a list with and empty object
+- [ ] Autogenerate network attach tags (and give option to disable)
 - [ ] Adding multiple peer_network_tags doesn't do anything very useful right now, make it so a peering will be generated for each tag so you can use the tags as a shortcut for generating peerings to multiple networks
 - [ ] Retest name generation
 - [x] Perhaps explore tagging as an option for peering networks

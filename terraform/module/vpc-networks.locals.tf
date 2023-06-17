@@ -2,10 +2,11 @@ locals {
   compute_networks_0 = [
     # TODO Set unset booleans to a default value here, use that to simplify later code
     for network in var.compute_networks : {
-      project                 = try(network.project, var.default_project)
-      auto_create_subnetworks = network.auto_create_subnetworks
-      add_iap_firewall_rule   = network.add_iap_firewall_rule
-      tags                    = network.tags
+      project                          = try(network.project, var.default_project)
+      auto_create_subnetworks          = network.auto_create_subnetworks
+      add_allow_internal_firewall_rule = network.add_allow_internal_firewall_rule
+      add_iap_firewall_rule            = network.add_iap_firewall_rule
+      tags                             = network.tags
 
       name = coalesce(
         network.name,
@@ -71,11 +72,12 @@ locals {
 
   compute_networks_1 = [
     for network in local.compute_networks_0 : {
-      name                    = network.name
-      project                 = network.project
-      auto_create_subnetworks = network.auto_create_subnetworks
-      add_iap_firewall_rule   = network.add_iap_firewall_rule
-      tags                    = network.tags
+      name                             = network.name
+      project                          = network.project
+      auto_create_subnetworks          = network.auto_create_subnetworks
+      add_allow_internal_firewall_rule = network.add_allow_internal_firewall_rule
+      add_iap_firewall_rule            = network.add_iap_firewall_rule
+      tags                             = network.tags
 
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
@@ -166,11 +168,12 @@ locals {
 
   compute_networks_2 = [
     for network in local.compute_networks_1 : {
-      name                    = network.name
-      project                 = network.project
-      auto_create_subnetworks = network.auto_create_subnetworks
-      add_iap_firewall_rule   = network.add_iap_firewall_rule
-      tags                    = network.tags
+      name                             = network.name
+      project                          = network.project
+      auto_create_subnetworks          = network.auto_create_subnetworks
+      add_allow_internal_firewall_rule = network.add_allow_internal_firewall_rule
+      add_iap_firewall_rule            = network.add_iap_firewall_rule
+      tags                             = network.tags
 
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {
@@ -331,12 +334,13 @@ locals {
 
   compute_networks_3 = [
     for network in local.compute_networks_2 : {
-      name                    = network.name
-      project                 = network.project
-      auto_create_subnetworks = network.auto_create_subnetworks
-      add_iap_firewall_rule   = network.add_iap_firewall_rule
-      tags                    = network.tags
-      compute_subnetworks     = network.compute_subnetworks
+      name                             = network.name
+      project                          = network.project
+      auto_create_subnetworks          = network.auto_create_subnetworks
+      add_allow_internal_firewall_rule = network.add_allow_internal_firewall_rule
+      add_iap_firewall_rule            = network.add_iap_firewall_rule
+      tags                             = network.tags
+      compute_subnetworks              = network.compute_subnetworks
 
       compute_network_peerings = network.compute_network_peerings == null ? [] : [
         for idx, peering in network.compute_network_peerings : {
@@ -373,11 +377,12 @@ locals {
 
   compute_networks = [
     for network in local.compute_networks_3 : {
-      name                    = network.name
-      project                 = network.project
-      auto_create_subnetworks = network.auto_create_subnetworks
-      add_iap_firewall_rule   = network.add_iap_firewall_rule
-      tags                    = network.tags
+      name                             = network.name
+      project                          = network.project
+      auto_create_subnetworks          = network.auto_create_subnetworks
+      add_allow_internal_firewall_rule = network.add_allow_internal_firewall_rule
+      add_iap_firewall_rule            = network.add_iap_firewall_rule
+      tags                             = network.tags
 
       compute_subnetworks = network.compute_subnetworks == null ? [] : [
         for idx, subnetwork in network.compute_subnetworks : {

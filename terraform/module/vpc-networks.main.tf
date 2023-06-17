@@ -87,6 +87,53 @@ resource "google_compute_router_nat" "main" {
   }
 }
 
+resource "google_compute_firewall" "allow-internal" {
+  for_each = { for network in local.compute_networks : network.name => network
+    if(
+      network.add_allow_internal_firewall_rule != null
+      ? network.add_allow_internal_firewall_rule == true
+      ? true
+      : false
+      : true
+    )
+  }
+  project     = each.value.project != null ? each.value.project : var.default_project
+  name        = "${each.value.name}-allow-internal"
+  network     = resource.google_compute_network.compute_networks[each.value.name].self_link
+  description = "Allows internal traffic within the network"
+  direction   = "INGRESS"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "icmp"
+  }
+
+  # TODO Create a map in locals that looks something like this:
+  # network_cidr_ranges {
+  #   "network_1_name" = [
+  #     "primary range"
+  #     "secondary range 0"
+  #     "secondary range 1"
+  #     "secondary range 2"
+  #   ],
+  #   ...
+  # }
+  source_ranges = [
+    "10.2.0.0/16",
+    "192.168.0.0/16", # Pods
+    "10.244.0.0/16",  # Also pods
+  ]
+}
+
 resource "google_compute_firewall" "iap-rules" {
   for_each = { for network in local.compute_networks : network.name => network
     if(

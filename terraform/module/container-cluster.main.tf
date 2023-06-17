@@ -1,15 +1,15 @@
-resource "google_project_service" "gke" {
-  count                      = length(local.container_clusters) >= 0 ? 1 : 0
-  project                    = var.default_project # TODO Enable in each local.container_clusters[*].project
-  service                    = "container.googleapis.com"
-  disable_dependent_services = true
-}
+#resource "google_project_service" "gke" {
+#  count                      = length(local.container_clusters) >= 0 ? 1 : 0
+#  project                    = var.default_project # TODO Enable in each local.container_clusters[*].project
+#  service                    = "container.googleapis.com"
+#  disable_dependent_services = true
+#}
 
 resource "google_container_cluster" "main" {
   for_each = { for cluster in local.container_clusters : cluster.name => cluster }
-  depends_on = [
-    google_project_service.gke
-  ]
+  #depends_on = [
+  #  google_project_service.gke
+  #]
   name                     = each.value.name
   project                  = each.value.project
   location                 = each.value.location

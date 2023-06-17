@@ -3,10 +3,63 @@ package_update: true
 package_upgrade: true
 
 packages:
-  - git
+  - containerd
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - gnupg2
+  - lsb-release
+  - curl
+  - software-properties-common
 
-ansible:
-  install_method: pip
-  pull:
-    url: "https://github.com/holmanb/vmboot.git"
-    playbook_name: ubuntu.yml
+#ansible:
+#  install_method: pip
+#  pull:
+#    url: "https://github.com/holmanb/vmboot.git"
+#    playbook_name: ubuntu.yml
+
+write_files:
+  - content: |
+      overlay
+      br_netfilter
+    path: /etc/modules-load.d/containerd.conf
+  - content: |
+      net.bridge.bridge-nf-call-iptables = 1
+      net.ipv4.ip_forward = 1
+      net.bridge.bridge-nf-call-ip6tables = 1
+    path: /etc/sysctl.d/99-kubernetes-cri.conf
+  - content: |
+      deb https://apt.kubernetes.io/ kubernetes-xenial main
+    path: /etc/apt/sources.list.d/kubernetes.list
+    append: true
+
+runcmd:
+  - systemctl stop ufw
+  - systemctl disable ufw
+  - systemctl stop apparmor
+  - systemctl disable apparmor
+  - modprobe overlay
+  - modprobe br_netfilter
+  - sysctl -w net.bridge.bridge-nf-call-ip6tables = 1
+  - sysctl -w net.bridge.bridge-nf-call-iptables = 1
+  - sysctl -w net.ipv4.ip_forward=1
+  - sysctl --system
+  - swapoff -a
+  - mkdir -p /etc/containerd
+  - containerd config default | tee /etc/containerd/config.toml
+  - systemctl restart containerd
+  - systemctl status containerd
+  - curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+  - apt-get update
+  #- apt-get install -y kubelet=1.24.0-00 kubeadm=1.24.0-00 kubectl=1.24.0-00
+  - apt-get install -y kubelet kubeadm kubectl
+  - apt-mark hold kubelet kubeadm kubectl
+  # TODO Don't think this worked, might need more arguments like a package name or somesuch:
+  #- kubeadm config images pull
+
+power_state:
+    delay: 30
+    mode: reboot
+    message: Booting
+    timeout: 2
+    condition: true

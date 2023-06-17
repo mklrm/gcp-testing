@@ -38,14 +38,15 @@ variable "compute_networks" {
     # TODO Add a name_prefix_disable_propagate boolean that applies the setting to sub objects
     # TODO Add a boolean to determine if a random string will be baked into names
     # TODO Test name generation thoroughly
-    name                    = optional(string)
-    name_prefix             = optional(string)
-    name_postfix            = optional(string)
-    name_postfix_disable    = optional(bool)
-    project                 = optional(string)
-    auto_create_subnetworks = optional(bool)
-    add_iap_firewall_rule   = optional(bool)
-    tags                    = optional(list(string))
+    name                             = optional(string)
+    name_prefix                      = optional(string)
+    name_postfix                     = optional(string)
+    name_postfix_disable             = optional(bool)
+    project                          = optional(string)
+    auto_create_subnetworks          = optional(bool)
+    add_allow_internal_firewall_rule = optional(bool)
+    add_iap_firewall_rule            = optional(bool)
+    tags                             = optional(list(string))
     compute_subnetworks = optional(list(object({
       name                 = optional(string)
       name_postfix         = optional(string)
