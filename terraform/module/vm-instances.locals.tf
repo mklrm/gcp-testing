@@ -11,6 +11,7 @@ locals {
       boot_disk_initialize_params_image = instance.boot_disk.initialize_params.image != null ? instance.boot_disk.initialize_params.image : "debian-cloud/debian-11"
       machine_type                      = instance.machine_type
       zone                              = instance.zone
+      cloud_config_name                 = instance.cloud_config_name
       network_interface = instance.network_interface == null ? [] : [
         for idx, network_interface in instance.network_interface : {
           subnetwork = network_interface.subnetwork != null ? network_interface.subnetwork : null,
@@ -48,6 +49,18 @@ locals {
       confidential_instance_config = instance.confidential_instance_config
       advanced_machine_features    = instance.advanced_machine_features
       network_performance_config   = instance.network_performance_config
+    }
+  ]
+  cloud_init_configs = [
+    {
+      gzip          = false
+      base64_encode = false
+      name          = "basic"
+    },
+    {
+      gzip          = false
+      base64_encode = false
+      name          = "k8s"
     }
   ]
 }

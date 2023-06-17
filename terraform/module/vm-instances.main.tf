@@ -1,11 +1,13 @@
-data "cloudinit_config" "conf" {
-  gzip          = false
-  base64_encode = false
+
+data "cloudinit_config" "main" {
+  for_each      = { for cloud_init_config in local.cloud_init_configs : cloud_init_config.name => cloud_init_config }
+  gzip          = each.value.gzip != null ? each.value.gzip == true ? true : false : false
+  base64_encode = each.value.base64_encode != null ? each.value.base64_encode == true ? true : false : false
 
   part {
     content_type = "text/cloud-config"
-    content      = file("module/cloud-init/config.yaml")
-    filename     = "config.yaml"
+    content      = file("module/cloud-init/${each.value.name != null ? each.value.name == true ? true : "basic" : "basic"}.yaml")
+    filename     = "${each.value.name != null ? each.value.name == true ? true : "basic" : "basic"}.yaml"
   }
 }
 
@@ -55,7 +57,8 @@ resource "google_compute_instance" "compute_instances" {
   }
 
   metadata = {
-    user-data = data.cloudinit_config.conf.rendered
+    #user-data = data.cloudinit_config.conf.rendered
+    user-data = data.cloudinit_config.main[each.value.cloud_config_name != null ? each.value.cloud_config_name : "basic"].rendered
   }
 
   tags = each.value.tags

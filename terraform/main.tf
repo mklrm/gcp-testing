@@ -110,6 +110,7 @@ module "dynamic_deployment" {
       description          = "A compute instance"
       machine_type         = "e2-medium"
       zone                 = "us-central1-a"
+      cloud_config_name    = "k8s"
 
       boot_disk = {
         initialize_params = {
@@ -133,6 +134,7 @@ module "dynamic_deployment" {
       description          = "A compute instance"
       machine_type         = "e2-small"
       zone                 = "us-central1-a"
+      cloud_config_name    = "k8s"
 
       boot_disk = {
         initialize_params = {
@@ -155,6 +157,30 @@ module "dynamic_deployment" {
       name_postfix_disable = true
       description          = "A compute instance"
       machine_type         = "e2-small"
+      zone                 = "us-central1-a"
+      cloud_config_name    = "k8s"
+
+      boot_disk = {
+        initialize_params = {
+          image = "ubuntu-os-cloud/ubuntu-2204-lts"
+        }
+      }
+
+      network_interface = [
+        {
+        }
+      ]
+
+      tags = [
+        "attach-to-pigsty",
+        "allow-iap",
+      ]
+    },
+    {
+      name_prefix          = "k8s-test-vm-0"
+      name_postfix_disable = true
+      description          = "A compute instance"
+      machine_type         = "e2-medium"
       zone                 = "us-central1-a"
 
       boot_disk = {

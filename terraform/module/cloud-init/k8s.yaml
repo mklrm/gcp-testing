@@ -50,6 +50,9 @@ runcmd:
   - systemctl restart containerd
   - systemctl status containerd
   - curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+  # Added as mentioned here https://www.linkedin.com/pulse/kubernetes-cluster-setup-ubuntu-2204-using-kubeadm-calico-md-sajjad/because apt was complaining something that may be connected
+  - sudo mkdir /etc/apt/keyrings
+  - sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
   - apt-get update
   #- apt-get install -y kubelet=1.24.0-00 kubeadm=1.24.0-00 kubectl=1.24.0-00
   - apt-get install -y kubelet kubeadm kubectl

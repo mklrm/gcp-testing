@@ -13,6 +13,8 @@
 - [ ] Autogenerate network attach tags (and give option to disable)
 - [ ] Adding multiple peer_network_tags doesn't do anything very useful right now, make it so a peering will be generated for each tag so you can use the tags as a shortcut for generating peerings to multiple networks
 - [ ] Retest name generation
+- [ ] Automate adding the cloud init config yaml:s to locals by listing the files
+- [ ] Can probably make cloudinit_config.main more readable by replacing the conditional expression with something else
 - [x] Perhaps explore tagging as an option for peering networks
 - [x] Subnetworks, secondary ranges and Cloud NATs now alway get a postfixed idx number, should be able to disable that
 

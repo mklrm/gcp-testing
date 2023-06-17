@@ -22,6 +22,7 @@ variable "compute_instances" {
     name_postfix         = optional(string)
     name_postfix_disable = optional(bool)
     zone                 = optional(string)
+    cloud_config_name    = optional(string)
     network_interface = optional(list(object({
       network_name                    = optional(string)
       network_name_prefix             = optional(string)
