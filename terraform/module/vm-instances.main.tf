@@ -6,8 +6,8 @@ data "cloudinit_config" "main" {
 
   part {
     content_type = "text/cloud-config"
-    content      = file("module/cloud-init/${each.value.name != null ? each.value.name == true ? true : "basic" : "basic"}.yaml")
-    filename     = "${each.value.name != null ? each.value.name == true ? true : "basic" : "basic"}.yaml"
+    content      = file("module/cloud-init/${each.value.name != null ? each.value.name : "basic"}.yaml")
+    filename     = "${each.value.name != null ? each.value.name : "basic"}.yaml"
   }
 }
 
